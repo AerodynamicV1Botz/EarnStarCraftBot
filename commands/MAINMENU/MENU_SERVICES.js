@@ -16,57 +16,96 @@
   group: 
 CMD*/
 
-// ==========================================
+/*CMD
+  command: MENU_SERVICES
+  need_reply: false
+  folder: MAIN_MENU
+*/
+
+// =====================================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 6 — UPDATED VERSION
-// COMMAND: MENU_SERVICES
-// STEP 3 — SERVICES
-// 📁 MAIN MENU FOLDER
+// SCRIPT 6 — MENU_SERVICES
+// STEP 2.1 — SERVICES MENU
+// CLIENT → MAIN MENU → SERVICES
+//
 // 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ✅ Same Message Edit + Delete Fallback
-// ==========================================
+// ✅ Same Message Edit
+// ✅ Delete + Send Fallback
+// ✅ Safe Language Detection
+// ✅ Existing Service Buttons Preserved
+//
+// CONNECTED COMMANDS:
+// SERVICE_CUSTOM_BOT
+// SERVICE_AUTOMATION
+// SERVICE_ADMIN
+// SERVICE_SUPPORT
+// SERVICE_BROADCAST
+// SERVICE_CUSTOM
+// BACK_MAIN_MENU
+// =====================================================
 
-// ==========================================
+
+// =====================================================
 // ⚡ INSTANT CALLBACK RESPONSE
-// ==========================================
+// =====================================================
 
-if (typeof request !== "undefined" && request && request.id) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.id
+) {
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback response errors
+  }
 }
 
-// ==========================================
-// ---------- USER INFO ----------
-// ==========================================
 
-let userId = user.telegramid
-let userKey = "USER_" + userId
+// =====================================================
+// 👤 USER INFORMATION
+// =====================================================
 
-let userData = Bot.getProperty(userKey)
+var userId = String(user.telegramid)
+var userKey = "USER_" + userId
 
-let language = "hinglish"
+var userData = Bot.getProperty(userKey)
 
-if (userData && userData.language) {
+var language = "hinglish"
+
+if (
+  userData &&
+  userData.language &&
+  (
+    userData.language == "hinglish" ||
+    userData.language == "english" ||
+    userData.language == "gujarati"
+  )
+) {
   language = userData.language
 }
 
-// ==========================================
-// ---------- MENU VARIABLES ----------
-// ==========================================
 
-let text = ""
-let buttons = []
+// =====================================================
+// 💬 MENU VARIABLES
+// =====================================================
 
-// ==========================================
+var text = ""
+var buttons = []
+
+
+// =====================================================
 // 🇮🇳 HINGLISH
-// ==========================================
+// =====================================================
 
 if (language == "hinglish") {
 
   text =
     "🛠️ <b>Our Services</b>\n\n" +
-    "Hum businesses, creators aur communities ke liye professional Telegram solutions banate hain.\n\n" +
+    "Hum businesses, creators aur communities ke liye " +
+    "professional Telegram solutions banate hain.\n\n" +
     "👇 <b>Service choose karo:</b>"
 
   buttons = [
@@ -109,22 +148,24 @@ if (language == "hinglish") {
     [
       {
         text: "⬅️ Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
 
 }
 
-// ==========================================
+
+// =====================================================
 // 🇬🇧 ENGLISH
-// ==========================================
+// =====================================================
 
 else if (language == "english") {
 
   text =
     "🛠️ <b>Our Services</b>\n\n" +
-    "We build professional Telegram solutions for businesses, creators and communities.\n\n" +
+    "We build professional Telegram solutions for " +
+    "businesses, creators and communities.\n\n" +
     "👇 <b>Select a service:</b>"
 
   buttons = [
@@ -167,22 +208,24 @@ else if (language == "english") {
     [
       {
         text: "⬅️ Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
 
 }
 
-// ==========================================
+
+// =====================================================
 // 🇬🇺 GUJARATI
-// ==========================================
+// =====================================================
 
 else if (language == "gujarati") {
 
   text =
     "🛠️ <b>અમારી Services</b>\n\n" +
-    "અમે Business, Creators અને Communities માટે Professional Telegram Solutions બનાવીએ છીએ.\n\n" +
+    "અમે Business, Creators અને Communities માટે " +
+    "Professional Telegram Solutions બનાવીએ છીએ.\n\n" +
     "👇 <b>Service પસંદ કરો:</b>"
 
   buttons = [
@@ -225,38 +268,51 @@ else if (language == "gujarati") {
     [
       {
         text: "⬅️ Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
 
 }
 
-// ==========================================
-// ✏️ MESSAGE HANDLING
-// ==========================================
 
-let messageId = null
+// =====================================================
+// 🆔 MESSAGE INFORMATION
+// =====================================================
+
+var messageId = null
+var chatId = userId
 
 if (
   typeof request !== "undefined" &&
   request &&
-  request.message &&
-  request.message.message_id
+  request.message
 ) {
-  messageId = request.message.message_id
+
+  if (request.message.message_id) {
+    messageId = request.message.message_id
+  }
+
+  if (
+    request.message.chat &&
+    request.message.chat.id
+  ) {
+    chatId = String(request.message.chat.id)
+  }
+
 }
 
-// ==========================================
+
+// =====================================================
 // 🔄 EDIT SAME MESSAGE
-// ==========================================
+// =====================================================
 
 if (messageId) {
 
   try {
 
     Api.editMessageText({
-      chat_id: userId,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -267,27 +323,27 @@ if (messageId) {
 
   } catch (error) {
 
-    // ==========================================
-    // 🧹 EDIT FAIL → DELETE OLD MESSAGE
-    // ==========================================
+    // =================================================
+    // 🧹 EDIT FAILED → DELETE OLD MESSAGE
+    // =================================================
 
     try {
 
       Api.deleteMessage({
-        chat_id: userId,
+        chat_id: chatId,
         message_id: messageId
       })
 
     } catch (deleteError) {
-      // Old message already deleted ho toh ignore
+      // Ignore if message is already deleted
     }
 
-    // ==========================================
+    // =================================================
     // 📤 SEND NEW MESSAGE
-    // ==========================================
+    // =================================================
 
     Api.sendMessage({
-      chat_id: userId,
+      chat_id: chatId,
       text: text,
       parse_mode: "HTML",
       reply_markup: {
@@ -299,14 +355,15 @@ if (messageId) {
 
 }
 
-// ==========================================
-// 📤 DIRECT COMMAND → NEW MESSAGE
-// ==========================================
+
+// =====================================================
+// 📤 DIRECT COMMAND → SEND NEW MESSAGE
+// =====================================================
 
 else {
 
   Api.sendMessage({
-    chat_id: userId,
+    chat_id: chatId,
     text: text,
     parse_mode: "HTML",
     reply_markup: {

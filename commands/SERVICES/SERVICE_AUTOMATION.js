@@ -16,51 +16,139 @@
   group: 
 CMD*/
 
-// ==========================================
+/*CMD
+  command: SERVICE_AUTOMATION
+  need_reply: false
+  folder: SERVICES
+*/
+
+// =====================================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 8 — UPDATED VERSION
-// COMMAND NAME: SERVICE_AUTOMATION
-// STEP 3.2 — BUSINESS AUTOMATION
-// 📁 MAIN MENU → 📁 SERVICES
+// SCRIPT 8 — SERVICE_AUTOMATION
+// STEP 2.1.2 — BUSINESS AUTOMATION
+//
+// CLIENT FLOW:
+// MAIN_MENU → MENU_SERVICES → SERVICE_AUTOMATION
+//
 // 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ✅ Same Message Edit + Delete Fallback
-// ==========================================
+// ✅ Safe Language Detection
+// ✅ User Activity Save
+// ✅ Same Message Edit
+// ✅ Delete + Send Fallback
+// ✅ Existing Buttons Preserved
+//
+// CONNECTED COMMANDS:
+// MENU_DEMO
+// MENU_BUILD
+// MENU_PRICING
+// MENU_SERVICES
+// =====================================================
 
 
-// ==========================================
+// =====================================================
 // ⚡ INSTANT CALLBACK RESPONSE
-// ==========================================
+// =====================================================
 
-if (typeof request !== "undefined" && request && request.id) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.id
+) {
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback response errors
+  }
 }
 
 
-// ==========================================
+// =====================================================
 // 👤 USER DATA
-// ==========================================
+// =====================================================
 
-let userId = user.telegramid
-let userData = Bot.getProperty("USER_" + userId)
+var userId = String(user.telegramid)
+var userKey = "USER_" + userId
 
-let language = userData && userData.language
-  ? userData.language
-  : "hinglish"
+var userData = Bot.getProperty(userKey)
 
-
-// ==========================================
-// 📝 TEXT + BUTTONS
-// ==========================================
-
-let text = ""
-let buttons = []
+if (
+  !userData ||
+  typeof userData !== "object"
+) {
+  userData = {}
+}
 
 
-// ==========================================
+// =====================================================
+// 🌐 LANGUAGE VALIDATION
+// =====================================================
+
+var language = "hinglish"
+
+if (
+  userData.language == "hinglish" ||
+  userData.language == "english" ||
+  userData.language == "gujarati"
+) {
+  language = userData.language
+}
+
+
+// =====================================================
+// 💾 SAVE USER ACTIVITY
+// =====================================================
+
+userData.userId = userId
+userData.lastCommand = "SERVICE_AUTOMATION"
+userData.lastVisitedAt = new Date().toISOString()
+
+Bot.setProperty(
+  userKey,
+  userData,
+  "json"
+)
+
+
+// =====================================================
+// 🆔 CHAT AND MESSAGE INFORMATION
+// =====================================================
+
+var chatId = userId
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message
+) {
+
+  if (
+    request.message.chat &&
+    request.message.chat.id
+  ) {
+    chatId = String(request.message.chat.id)
+  }
+
+  if (request.message.message_id) {
+    messageId = request.message.message_id
+  }
+
+}
+
+
+// =====================================================
+// 💬 TEXT AND BUTTONS
+// =====================================================
+
+var text = ""
+var buttons = []
+
+
+// =====================================================
 // 🇮🇳 HINGLISH
-// ==========================================
+// =====================================================
 
 if (language == "hinglish") {
 
@@ -113,9 +201,9 @@ if (language == "hinglish") {
 }
 
 
-// ==========================================
+// =====================================================
 // 🇬🇧 ENGLISH
-// ==========================================
+// =====================================================
 
 else if (language == "english") {
 
@@ -168,9 +256,9 @@ else if (language == "english") {
 }
 
 
-// ==========================================
+// =====================================================
 // 🇬🇺 GUJARATI
-// ==========================================
+// =====================================================
 
 else if (language == "gujarati") {
 
@@ -189,14 +277,14 @@ else if (language == "gujarati") {
     "• 🔗 API / Webhook Integration\n" +
     "• 🤖 AI-assisted Automation\n\n" +
     "━━━━━━━━━━━━━━━━━━\n\n" +
-    "💰 <b>Starting from ₹999</b>\n\n" +
+    "💰 <b>₹999 થી શરૂઆત</b>\n\n" +
     "📌 Price તમારી requirements અને automation ની complexity પર આધારિત રહેશે.\n\n" +
     "🚀 <b>તમારું Repetitive કામ → Smart Automated Workflow.</b>"
 
   buttons = [
     [
       {
-        text: "🎬 View Demo",
+        text: "🎬 Demo જુઓ",
         callback_data: "MENU_DEMO"
       }
     ],
@@ -223,32 +311,16 @@ else if (language == "gujarati") {
 }
 
 
-// ==========================================
-// ✏️ MESSAGE ID
-// ==========================================
-
-let messageId = null
-
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
-}
-
-
-// ==========================================
-// 🔄 SAME MESSAGE EDIT SYSTEM
-// ==========================================
+// =====================================================
+// 🔄 EDIT SAME MESSAGE
+// =====================================================
 
 if (messageId) {
 
   try {
 
     Api.editMessageText({
-      chat_id: userId,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -259,26 +331,27 @@ if (messageId) {
 
   } catch (error) {
 
-    // ======================================
-    // 🧹 DELETE OLD MESSAGE
-    // ======================================
+    // =================================================
+    // 🧹 EDIT FAILED → DELETE OLD MESSAGE
+    // =================================================
 
     try {
 
       Api.deleteMessage({
-        chat_id: userId,
+        chat_id: chatId,
         message_id: messageId
       })
 
     } catch (deleteError) {
-      // Old message already deleted ho toh ignore
+      // Ignore delete error
     }
 
-    // ======================================
-    // 📩 SEND NEW MESSAGE
-    // ======================================
+    // =================================================
+    // 📤 SEND NEW MESSAGE
+    // =================================================
 
     Api.sendMessage({
+      chat_id: chatId,
       text: text,
       parse_mode: "HTML",
       reply_markup: {
@@ -291,13 +364,14 @@ if (messageId) {
 }
 
 
-// ==========================================
-// 📩 DIRECT COMMAND MESSAGE
-// ==========================================
+// =====================================================
+// 📤 DIRECT COMMAND → SEND NEW MESSAGE
+// =====================================================
 
 else {
 
   Api.sendMessage({
+    chat_id: chatId,
     text: text,
     parse_mode: "HTML",
     reply_markup: {

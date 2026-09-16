@@ -16,62 +16,142 @@
   group: 
 CMD*/
 
-// ==========================================
-// 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 13 — UPDATED VERSION
-// COMMAND NAME: MENU_PRICING
-// STEP 4 — PRICING
-// 📁 MAIN MENU → 📁 PRICING
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ✅ Same Message Edit Ready
-// ==========================================
+/*CMD
+  command: MENU_PRICING
+  need_reply: false
+  folder: MAIN_MENU
+*/
 
-// ==========================================
-// ⚡ INSTANT CALLBACK RESPONSE
-// ==========================================
+// =====================================================
+// 🤖 EARNSTAR BOTCRAFT
+// SCRIPT 13 — MENU_PRICING
+// STEP 2.2 — PRICING MENU
+// PURPOSE: Show all available bot packages and pricing
+// CONNECTIONS: MAIN_MENU / SERVICE PAGES → MENU_PRICING
+// NEXT: PRICE_STARTER / PRICE_BUSINESS / PRICE_PRO / PRICE_CUSTOM
+// =====================================================
+
+
+// =====================================================
+// ⚡ CALLBACK RESPONSE
+// =====================================================
 
 if (
   typeof request !== "undefined" &&
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {}
 }
 
-// ==========================================
-// 👤 USER DATA & LANGUAGE
-// ==========================================
 
-let userId = user.telegramid
+// =====================================================
+// 👤 USER DATA
+// =====================================================
 
-let userData = Bot.getProperty("USER_" + userId)
+var userId = String(user.telegramid)
 
-let language =
-  userData && userData.language
-    ? userData.language
-    : "hinglish"
+var userData = Bot.getProperty(
+  "USER_" + userId
+)
 
-let text = ""
-let buttons = []
+if (
+  !userData ||
+  typeof userData !== "object" ||
+  Array.isArray(userData)
+) {
+  userData = {}
+}
 
-// ==========================================
+
+// =====================================================
+// 🌐 LANGUAGE
+// =====================================================
+
+var language = userData.language || "hinglish"
+
+if (
+  language !== "hinglish" &&
+  language !== "english" &&
+  language !== "gujarati"
+) {
+  language = "hinglish"
+}
+
+
+// =====================================================
+// 📝 USER ACTIVITY
+// =====================================================
+
+var now = new Date().toISOString()
+
+userData.lastCommand = "MENU_PRICING"
+userData.lastVisitedAt = now
+userData.updatedAt = now
+
+Bot.setProperty(
+  "USER_" + userId,
+  userData,
+  "json"
+)
+
+
+// =====================================================
+// 💬 CHAT + MESSAGE ID
+// =====================================================
+
+var chatId = userId
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message &&
+  request.message.chat &&
+  request.message.chat.id
+) {
+  chatId = request.message.chat.id
+}
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message &&
+  request.message.message_id
+) {
+  messageId = request.message.message_id
+}
+
+
+// =====================================================
+// 📝 TEXT + BUTTONS
+// =====================================================
+
+var text = ""
+var buttons = []
+
+
+// =====================================================
 // 🇮🇳 HINGLISH
-// ==========================================
+// =====================================================
 
-if (language == "hinglish") {
+if (language === "hinglish") {
 
   text =
     "💰 <b>EarnStar BOTCRAFT — Pricing</b>\n\n" +
     "Aapki requirement ke according package choose karo.\n\n" +
+
     "🟢 <b>STARTER — ₹499+</b>\n" +
     "• Basic Telegram Bot\n" +
     "• Welcome System\n" +
     "• Custom Buttons\n" +
     "• Basic Menu\n" +
     "• Basic Auto Reply\n\n" +
+
     "🔵 <b>BUSINESS — ₹1,499+</b>\n" +
     "• Everything in Starter\n" +
     "• Advanced Menus\n" +
@@ -80,6 +160,7 @@ if (language == "hinglish") {
     "• Admin Controls\n" +
     "• Notifications\n" +
     "• Automated Forms\n\n" +
+
     "🟣 <b>PROFESSIONAL — ₹2,999+</b>\n" +
     "• Everything in Business\n" +
     "• Advanced Automation\n" +
@@ -88,13 +169,17 @@ if (language == "hinglish") {
     "• Advanced Admin Features\n" +
     "• API / Webhook Integration\n" +
     "• Custom Workflows\n\n" +
+
     "💎 <b>CUSTOM — QUOTE</b>\n" +
     "• Unique Requirements\n" +
     "• Complex Automation\n" +
     "• Custom Integrations\n" +
     "• Advanced Business Solutions\n\n" +
+
     "━━━━━━━━━━━━━━━━━━\n\n" +
+
     "📌 <b>Final price</b> features aur project complexity ke according confirm hota hai.\n\n" +
+
     "🚀 <b>Not sure which package you need?</b>\n" +
     "Build My Bot par apni requirement submit karo."
 
@@ -128,28 +213,30 @@ if (language == "hinglish") {
     [
       {
         text: "⬅️ Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
-
 }
 
-// ==========================================
-// 🇬🇧 ENGLISH
-// ==========================================
 
-else if (language == "english") {
+// =====================================================
+// 🇬🇧 ENGLISH
+// =====================================================
+
+else if (language === "english") {
 
   text =
     "💰 <b>EarnStar BOTCRAFT — Pricing</b>\n\n" +
     "Choose a package based on your requirements.\n\n" +
+
     "🟢 <b>STARTER — ₹499+</b>\n" +
     "• Basic Telegram Bot\n" +
     "• Welcome System\n" +
     "• Custom Buttons\n" +
     "• Basic Menu\n" +
     "• Basic Auto Reply\n\n" +
+
     "🔵 <b>BUSINESS — ₹1,499+</b>\n" +
     "• Everything in Starter\n" +
     "• Advanced Menus\n" +
@@ -158,6 +245,7 @@ else if (language == "english") {
     "• Admin Controls\n" +
     "• Notifications\n" +
     "• Automated Forms\n\n" +
+
     "🟣 <b>PROFESSIONAL — ₹2,999+</b>\n" +
     "• Everything in Business\n" +
     "• Advanced Automation\n" +
@@ -166,13 +254,17 @@ else if (language == "english") {
     "• Advanced Admin Features\n" +
     "• API / Webhook Integration\n" +
     "• Custom Workflows\n\n" +
+
     "💎 <b>CUSTOM — QUOTE</b>\n" +
     "• Unique Requirements\n" +
     "• Complex Automation\n" +
     "• Custom Integrations\n" +
     "• Advanced Business Solutions\n\n" +
+
     "━━━━━━━━━━━━━━━━━━\n\n" +
+
     "📌 <b>Final pricing</b> is confirmed according to features and project complexity.\n\n" +
+
     "🚀 <b>Not sure which package you need?</b>\n" +
     "Submit your requirements through Build My Bot."
 
@@ -206,28 +298,30 @@ else if (language == "english") {
     [
       {
         text: "⬅️ Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
-
 }
 
-// ==========================================
-// 🇬🇺 GUJARATI
-// ==========================================
 
-else if (language == "gujarati") {
+// =====================================================
+// 🇬🇺 GUJARATI
+// =====================================================
+
+else if (language === "gujarati") {
 
   text =
     "💰 <b>EarnStar BOTCRAFT — Pricing</b>\n\n" +
     "તમારી Requirement પ્રમાણે Package પસંદ કરો.\n\n" +
+
     "🟢 <b>STARTER — ₹499+</b>\n" +
     "• Basic Telegram Bot\n" +
     "• Welcome System\n" +
     "• Custom Buttons\n" +
     "• Basic Menu\n" +
     "• Basic Auto Reply\n\n" +
+
     "🔵 <b>BUSINESS — ₹1,499+</b>\n" +
     "• Starter ની બધી Features\n" +
     "• Advanced Menus\n" +
@@ -236,6 +330,7 @@ else if (language == "gujarati") {
     "• Admin Controls\n" +
     "• Notifications\n" +
     "• Automated Forms\n\n" +
+
     "🟣 <b>PROFESSIONAL — ₹2,999+</b>\n" +
     "• Business ની બધી Features\n" +
     "• Advanced Automation\n" +
@@ -244,13 +339,17 @@ else if (language == "gujarati") {
     "• Advanced Admin Features\n" +
     "• API / Webhook Integration\n" +
     "• Custom Workflows\n\n" +
+
     "💎 <b>CUSTOM — QUOTE</b>\n" +
     "• Unique Requirements\n" +
     "• Complex Automation\n" +
     "• Custom Integrations\n" +
     "• Advanced Business Solutions\n\n" +
+
     "━━━━━━━━━━━━━━━━━━\n\n" +
+
     "📌 <b>Final price</b> features અને project complexity પ્રમાણે confirm થશે.\n\n" +
+
     "🚀 <b>કયો Package લેવો તે સમજાતું નથી?</b>\n" +
     "Build My Bot દ્વારા તમારી Requirement મોકલો."
 
@@ -284,38 +383,23 @@ else if (language == "gujarati") {
     [
       {
         text: "⬅️ Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
-
 }
 
-// ==========================================
-// 📨 MESSAGE ID DETECTION
-// ==========================================
 
-let messageId = null
-
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
-}
-
-// ==========================================
-// ✏️ SAME MESSAGE EDIT SYSTEM
-// ==========================================
+// =====================================================
+// 🔄 SAME MESSAGE EDIT SYSTEM
+// =====================================================
 
 if (messageId) {
 
   try {
 
     Api.editMessageText({
-      chat_id: userId,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -326,42 +410,36 @@ if (messageId) {
 
   } catch (error) {
 
-    // ======================================
-    // 🧹 DELETE OLD MESSAGE
-    // ======================================
-
     try {
 
       Api.deleteMessage({
-        chat_id: userId,
+        chat_id: chatId,
         message_id: messageId
       })
 
     } catch (deleteError) {}
 
-    // ======================================
-    // 📩 SEND NEW MESSAGE
-    // ======================================
-
     Api.sendMessage({
+      chat_id: chatId,
       text: text,
       parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: buttons
       }
     })
-
   }
 
 }
 
-// ==========================================
+
+// =====================================================
 // 📩 DIRECT COMMAND MESSAGE
-// ==========================================
+// =====================================================
 
 else {
 
   Api.sendMessage({
+    chat_id: chatId,
     text: text,
     parse_mode: "HTML",
     reply_markup: {

@@ -60,7 +60,7 @@ var buttons = [
   [
     {
       text: "🏠 Main Menu",
-      callback_data: "BACK_MAIN_MENU"
+      callback_data: "MAIN_MENU"
     }
   ]
 ];

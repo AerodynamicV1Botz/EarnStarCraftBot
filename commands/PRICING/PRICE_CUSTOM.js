@@ -18,39 +18,126 @@ CMD*/
 
 // ==========================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 47 — UPDATED VERSION
+// SCRIPT 47
 // COMMAND NAME: PRICE_CUSTOM
 // STEP 4.4 — CUSTOM PACKAGE
-// 📁 MAIN MENU → 📁 PRICING → CUSTOM PACKAGE
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
+// PURPOSE: Show Custom package details and order options
+// CONNECTIONS: MENU_PRICING → PRICE_CUSTOM
+// NEXT: ORDER_CUSTOM / MY_ORDERS / MENU_SERVICES
 // ==========================================
 
+/*CMD
+  command: PRICE_CUSTOM
+  need_reply: false
+  folder: PRICING
+*/
 
-// ---------- SAFE CALLBACK RESPONSE ----------
+
+// ==========================================
+// ⚡ SAFE CALLBACK RESPONSE
+// ==========================================
+
 if (
   typeof request !== "undefined" &&
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback errors
+  }
 }
 
 
-// ---------- USER DATA ----------
-var uid = user.telegramid
+// ==========================================
+// 👤 USER DATA
+// ==========================================
 
-var userData = Bot.getProperty("USER_" + uid) || {}
+var uid = String(user.telegramid)
 
-var lang = userData.language || "hinglish"
+var userData = Bot.getProperty("USER_" + uid)
+
+if (
+  !userData ||
+  typeof userData !== "object" ||
+  Array.isArray(userData)
+) {
+  userData = {}
+}
 
 
-// ---------- PACKAGE TEXT ----------
+// ==========================================
+// 🌐 LANGUAGE
+// ==========================================
+
+var lang = userData.language
+
+if (
+  lang !== "hinglish" &&
+  lang !== "english" &&
+  lang !== "gujarati"
+) {
+  lang = "hinglish"
+}
+
+
+// ==========================================
+// 📝 USER ACTIVITY
+// ==========================================
+
+userData.lastCommand = "PRICE_CUSTOM"
+userData.lastVisitedAt = new Date().toISOString()
+userData.updatedAt = new Date().toISOString()
+
+Bot.setProperty(
+  "USER_" + uid,
+  userData,
+  "json"
+)
+
+
+// ==========================================
+// 💬 CHAT ID + MESSAGE ID
+// ==========================================
+
+var chatId = uid
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message
+) {
+
+  if (
+    request.message.chat &&
+    request.message.chat.id
+  ) {
+    chatId = request.message.chat.id
+  }
+
+  if (request.message.message_id) {
+    messageId = request.message.message_id
+  }
+
+}
+
+
+// ==========================================
+// 📝 PACKAGE TEXT
+// ==========================================
+
 var text = ""
 
-if (lang == "english") {
+
+// ==========================================
+// 🇬🇧 ENGLISH
+// ==========================================
+
+if (lang === "english") {
 
   text =
     "💎 <b>CUSTOM PACKAGE</b>\n\n" +
@@ -72,7 +159,12 @@ if (lang == "english") {
     "The final price depends on the features, complexity and integrations required.\n\n" +
     "📩 Tell us your idea and we'll discuss the requirements and quote."
 
-} else if (lang == "gujarati") {
+
+// ==========================================
+// 🇬🇺 GUJARATI
+// ==========================================
+
+} else if (lang === "gujarati") {
 
   text =
     "💎 <b>કસ્ટમ પેકેજ</b>\n\n" +
@@ -93,6 +185,11 @@ if (lang == "english") {
     "💡 <b>Pricing કેવી રીતે નક્કી થશે:</b>\n" +
     "Final price features, complexity અને required integrations પર આધારિત રહેશે.\n\n" +
     "📩 તમારી idea મોકલો અને અમે requirements અને quote વિશે વાત કરીશું."
+
+
+// ==========================================
+// 🇮🇳 HINGLISH
+// ==========================================
 
 } else {
 
@@ -119,18 +216,21 @@ if (lang == "english") {
 }
 
 
-// ---------- BUTTONS ----------
+// ==========================================
+// 🔘 BUTTONS
+// ==========================================
+
 var buttons = [
   [
     {
       text: "🚀 Build My Custom Bot",
-      callback_data: "ORDER_CUSTOM"
+      callback_data: "MENU_BUILD"
     }
   ],
   [
     {
-      text: "📋 My Custom Requests",
-      callback_data: "MY_CUSTOM_REQUESTS"
+      text: "📦 My Orders",
+      callback_data: "MY_ORDERS"
     }
   ],
   [
@@ -162,26 +262,16 @@ var buttons = [
 ]
 
 
-// ---------- MESSAGE ID ----------
-var messageId = null
+// ==========================================
+// ✏️ EDIT EXISTING MESSAGE / FALLBACK
+// ==========================================
 
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
-}
-
-
-// ---------- EDIT EXISTING MESSAGE ----------
 if (messageId) {
 
   try {
 
     Api.editMessageText({
-      chat_id: uid,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -192,7 +282,20 @@ if (messageId) {
 
   } catch (error) {
 
-    Bot.sendMessage(text, {
+    try {
+
+      Api.deleteMessage({
+        chat_id: chatId,
+        message_id: messageId
+      })
+
+    } catch (deleteError) {
+      // Ignore delete error
+    }
+
+    Api.sendMessage({
+      chat_id: chatId,
+      text: text,
       parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: buttons
@@ -203,7 +306,9 @@ if (messageId) {
 
 } else {
 
-  Bot.sendMessage(text, {
+  Api.sendMessage({
+    chat_id: chatId,
+    text: text,
     parse_mode: "HTML",
     reply_markup: {
       inline_keyboard: buttons

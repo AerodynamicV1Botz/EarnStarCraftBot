@@ -16,95 +16,212 @@
   group: 
 CMD*/
 
-// ==========================================
+/*CMD
+  command: ORDER_PRO
+  need_reply: false
+  folder: ORDERS
+*/
+
+// =====================================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 37 — UPDATED VERSION
-// COMMAND NAME: ORDER_PRO
+// SCRIPT 37 — ORDER_PRO
 // STEP 4.3.1 — PROFESSIONAL ORDER REQUEST
-// 📁 MAIN MENU → 📁 PRICING → PROFESSIONAL PACKAGE → ORDER
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ==========================================
+// =====================================================
 
 
-// ---------- SAFE CALLBACK RESPONSE ----------
+// =====================================================
+// ⚡ CALLBACK RESPONSE
+// =====================================================
+
+if (typeof request !== "undefined" && request && request.id) {
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    });
+  } catch (error) {}
+}
+
+
+// =====================================================
+// 👤 USER DETAILS
+// =====================================================
+
+var uid = String(user.telegramid);
+
+var userData = Bot.getProperty("USER_" + uid);
+
+if (!userData || typeof userData !== "object" || Array.isArray(userData)) {
+  userData = {};
+}
+
+
+// =====================================================
+// 🌐 LANGUAGE
+// =====================================================
+
+var language = userData.language || "hinglish";
+
 if (
-  typeof request !== "undefined" &&
-  request &&
-  request.id
+  language !== "hinglish" &&
+  language !== "english" &&
+  language !== "gujarati"
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  language = "hinglish";
 }
 
 
-// ---------- USER DATA ----------
-var uid = user.telegramid
+// =====================================================
+// 👤 TELEGRAM PROFILE
+// =====================================================
 
-var userData = Bot.getProperty("USER_" + uid) || {}
+var fullName = String(user.first_name || "");
 
-var lang = userData.language || "hinglish"
+if (user.last_name) {
+  fullName += " " + String(user.last_name);
+}
+
+fullName = fullName.trim() || "Telegram User";
+
+var telegramUsername = "";
+
+if (user.username) {
+  telegramUsername = "@" + String(user.username);
+}
+
+var premiumStatus = "Not Active";
+
+if (user.is_premium === true) {
+  premiumStatus = "Active";
+}
 
 
-// ---------- SAVE PRO REQUEST MODE ----------
+// =====================================================
+// 🕒 CURRENT TIMESTAMP
+// =====================================================
+
+var now = new Date().toISOString();
+
+
+// =====================================================
+// 📝 USER ACTIVITY
+// =====================================================
+
+userData.lastCommand = "ORDER_PRO";
+userData.lastVisitedAt = now;
+userData.updatedAt = now;
+
+Bot.setProperty("USER_" + uid, userData, "json");
+
+
+// =====================================================
+// 📦 CREATE PROFESSIONAL ORDER DRAFT
+// =====================================================
+
+var draft = {
+  id: "",
+  orderId: "",
+
+  userId: uid,
+
+  orderSource: "PACKAGE",
+  source: "PACKAGE",
+
+  packageType: "pro",
+  packageName: "Professional Package",
+  packageStep: "4.3",
+  packagePrice: "2999",
+
+  packageDetails: "",
+
+  advanceAmount: "",
+  remainingAmount: "",
+
+  telegramProfile: {
+    fullName: fullName,
+    telegramId: uid,
+    username: telegramUsername,
+    isPremium: premiumStatus
+  },
+
+  clientInfo: {
+    customName: ""
+  },
+
+  contacts: {
+    telegram: "",
+    otherNumber: "",
+    instagram: "",
+    whatsapp: "",
+    email: ""
+  },
+
+  requirements: "",
+  budget: "",
+  extraDetails: "",
+
+  stage: "contact_menu",
+
+  requestStatus: "draft",
+  orderStatus: "pending_review",
+  paymentStatus: "not_requested",
+  submissionStatus: "draft",
+
+  progress: 0,
+  progressTitle: "Order Started",
+  progressUpdate: "",
+
+  adminId: "",
+  adminNote: "",
+
+  createdAt: now,
+  updatedAt: now,
+
+  acceptedAt: "",
+  advanceRequestedAt: "",
+  advancePaidAt: "",
+  startedAt: "",
+  completedAt: "",
+  remainingRequestedAt: "",
+  remainingPaidAt: "",
+  deliveredAt: "",
+  submittedAt: ""
+};
+
+
+// =====================================================
+// 💾 SAVE ACTIVE PACKAGE DRAFT
+// =====================================================
+
 Bot.setProperty(
-  "PRO_MODE_" + uid,
-  "waiting",
+  "ORDER_" + uid,
+  draft,
+  "json"
+);
+
+draft.directOrderKey = "DIRECT_ORDER_PRO_" + uid;
+
+// =====================================================
+// 🔐 ACTIVE SOURCE
+// =====================================================
+
+Bot.setProperty(
+  "ORDER_ACTIVE_SOURCE_" + uid,
+  "PACKAGE",
   "string"
-)
+);
 
 
-// ---------- MESSAGE TEXT ----------
-var text = ""
+// =====================================================
+// 🧹 CLEAR OLD TEMPORARY DATA
+// =====================================================
 
-if (lang == "english") {
-
-  text =
-    "🟣 <b>Professional Bot Request</b>\n\n" +
-    "Please send your requirements in one message.\n\n" +
-    "📝 <b>Tell us:</b>\n" +
-    "• What type of bot do you need?\n" +
-    "• Which features do you want?\n" +
-    "• Any custom automation or integrations?\n" +
-    "• Your budget, if decided\n\n" +
-    "💡 You can also send a complete project description.\n\n" +
-    "📩 <b>Send your requirements now.</b>"
-
-} else if (lang == "gujarati") {
-
-  text =
-    "🟣 <b>પ્રોફેશનલ બોટ રિક્વેસ્ટ</b>\n\n" +
-    "તમારી requirements એક જ મેસેજમાં મોકલો.\n\n" +
-    "📝 <b>જણાવો:</b>\n" +
-    "• કયા પ્રકારનો બોટ જોઈએ છે?\n" +
-    "• કયા features જોઈએ છે?\n" +
-    "• કોઈ custom automation અથવા integrations?\n" +
-    "• Budget નક્કી હોય તો જણાવો\n\n" +
-    "💡 તમે complete project description પણ મોકલી શકો છો.\n\n" +
-    "📩 <b>હવે તમારી requirements મોકલો.</b>"
-
-} else {
-
-  text =
-    "🟣 <b>Professional Bot Request</b>\n\n" +
-    "Apni requirements ek hi message mein bhejo.\n\n" +
-    "📝 <b>Batao:</b>\n" +
-    "• Kis type ka bot chahiye?\n" +
-    "• Kaunse features chahiye?\n" +
-    "• Koi custom automation ya integrations?\n" +
-    "• Budget decide hai toh batao\n\n" +
-    "💡 Complete project description bhi bhej sakte ho.\n\n" +
-    "📩 <b>Ab apni requirements bhejo.</b>"
-
-}
+Bot.setProperty("ORDER_MODE_" + uid, "", "string");
+Bot.setProperty("ORDER_PACKAGE_" + uid, "", "string");
+Bot.setProperty("PRO_MODE_" + uid, "", "string");
 
 
-// ---------- SEND MESSAGE ----------
-Bot.sendMessage(text, {
-  parse_mode: "HTML"
-})
+// =====================================================
+// ➡️ NEXT STEP
+// =====================================================
 
-
-// ---------- NEXT STEP ----------
-Bot.runCommand("PRO_REQUEST_TEXT")
+Bot.runCommand("ORDER_CONTACT_MENU");

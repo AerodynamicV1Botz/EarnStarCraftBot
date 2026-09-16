@@ -16,19 +16,24 @@
   group: 
 CMD*/
 
+/*CMD
+  command: PRICE_BUSINESS
+  need_reply: false
+  folder: PRICING
+*/
+
 // ==========================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 25 — UPDATED VERSION
-// COMMAND NAME: PRICE_BUSINESS
+// SCRIPT 25 — PRICE_BUSINESS
 // STEP 4.2 — BUSINESS PACKAGE
-// 📁 MAIN MENU → 📁 PRICING → BUSINESS PACKAGE
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
+// PURPOSE: Show Business package details and order options
+// CONNECTIONS: MENU_PRICING → PRICE_BUSINESS
+// NEXT: ORDER_BUSINESS / MY_ORDERS / MENU_DEMO / PRICE_PRO
 // ==========================================
 
 
 // ==========================================
-// ⚡ INSTANT CALLBACK RESPONSE
+// ⚡ CALLBACK RESPONSE
 // ==========================================
 
 if (
@@ -36,24 +41,97 @@ if (
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback errors
+  }
 }
 
 
 // ==========================================
-// 👤 USER LANGUAGE
+// 👤 USER DATA
 // ==========================================
 
-var uid = user.telegramid
+var uid = String(user.telegramid)
 
-var userData = Bot.getProperty("USER_" + uid) || {}
+var userData = Bot.getProperty(
+  "USER_" + uid
+)
+
+if (
+  !userData ||
+  typeof userData !== "object" ||
+  Array.isArray(userData)
+) {
+  userData = {}
+}
+
+
+// ==========================================
+// 🌐 LANGUAGE
+// ==========================================
 
 var lang = userData.language || "hinglish"
 
-var text = ""
+if (
+  lang !== "hinglish" &&
+  lang !== "english" &&
+  lang !== "gujarati"
+) {
+  lang = "hinglish"
+}
 
+
+// ==========================================
+// 📝 USER ACTIVITY
+// ==========================================
+
+var now = new Date().toISOString()
+
+userData.lastCommand = "PRICE_BUSINESS"
+userData.lastVisitedAt = now
+userData.updatedAt = now
+
+Bot.setProperty(
+  "USER_" + uid,
+  userData,
+  "json"
+)
+
+
+// ==========================================
+// 💬 CHAT ID + MESSAGE ID
+// ==========================================
+
+var chatId = uid
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message
+) {
+  if (
+    request.message.chat &&
+    request.message.chat.id
+  ) {
+    chatId = request.message.chat.id
+  }
+
+  if (request.message.message_id) {
+    messageId = request.message.message_id
+  }
+}
+
+
+// ==========================================
+// 📝 TEXT + BUTTONS
+// ==========================================
+
+var text = ""
 var buttons = []
 
 
@@ -85,11 +163,43 @@ if (lang === "english") {
     "Tap <b>Build My Bot</b> to get started."
 
 
+  buttons = [
+    [
+      {
+        text: "🚀 Build My Bot",
+        callback_data: "ORDER_BUSINESS"
+      },
+      {
+        text: "📦 My Orders",
+        callback_data: "MY_ORDERS"
+      }
+    ],
+    [
+      {
+        text: "🎬 Live Demo",
+        callback_data: "MENU_DEMO"
+      },
+      {
+        text: "🟣 Professional",
+        callback_data: "PRICE_PRO"
+      }
+    ],
+    [
+      {
+        text: "💰 All Pricing",
+        callback_data: "MENU_PRICING"
+      }
+    ]
+  ]
+
+}
+
+
 // ==========================================
 // 🇬🇺 GUJARATI
 // ==========================================
 
-} else if (lang === "gujarati") {
+else if (lang === "gujarati") {
 
   text =
     "🔵 <b>બિઝનેસ પેકેજ</b>\n\n" +
@@ -113,11 +223,43 @@ if (lang === "english") {
     "<b>Build My Bot</b> પર tap કરો."
 
 
+  buttons = [
+    [
+      {
+        text: "🚀 Bot બનાવો",
+        callback_data: "ORDER_BUSINESS"
+      },
+      {
+        text: "📦 My Orders",
+        callback_data: "MY_ORDERS"
+      }
+    ],
+    [
+      {
+        text: "🎬 Live Demo",
+        callback_data: "MENU_DEMO"
+      },
+      {
+        text: "🟣 Professional",
+        callback_data: "PRICE_PRO"
+      }
+    ],
+    [
+      {
+        text: "💰 બધા Pricing",
+        callback_data: "MENU_PRICING"
+      }
+    ]
+  ]
+
+}
+
+
 // ==========================================
 // 🇮🇳 HINGLISH
 // ==========================================
 
-} else {
+else {
 
   text =
     "🔵 <b>BUSINESS PACKAGE</b>\n\n" +
@@ -140,65 +282,41 @@ if (lang === "english") {
     "💎 Professional business bot chahiye?\n" +
     "<b>Build My Bot</b> par tap karo."
 
-}
 
-
-// ==========================================
-// 🔘 BUTTONS
-// ==========================================
-
-buttons = [
-
-  [
-    {
-      text: "🚀 Build My Bot",
-      callback_data: "ORDER_BUSINESS"
-    },
-    {
-      text: "🔙 My Business Requests",
-      callback_data: "MY_BUSINESS_REQUESTS"
-    }
-  ],
-
-  [
-    {
-      text: "🎬 Live Demo",
-      callback_data: "MENU_DEMO"
-    },
-    {
-      text: "🟣 Professional",
-      callback_data: "PRICE_PRO"
-    }
-  ],
-
-  [
-    {
-      text: "💰 All Pricing",
-      callback_data: "MENU_PRICING"
-    }
+  buttons = [
+    [
+      {
+        text: "🚀 Build My Bot",
+        callback_data: "ORDER_BUSINESS"
+      },
+      {
+        text: "📦 My Orders",
+        callback_data: "MY_ORDERS"
+      }
+    ],
+    [
+      {
+        text: "🎬 Live Demo",
+        callback_data: "MENU_DEMO"
+      },
+      {
+        text: "🟣 Professional",
+        callback_data: "PRICE_PRO"
+      }
+    ],
+    [
+      {
+        text: "💰 All Pricing",
+        callback_data: "MENU_PRICING"
+      }
+    ]
   ]
 
-]
-
-
-// ==========================================
-// 🆔 MESSAGE ID
-// ==========================================
-
-var messageId = null
-
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
 }
 
 
 // ==========================================
-// ✏️ SAME MESSAGE EDIT
+// ✏️ EDIT CURRENT MESSAGE
 // ==========================================
 
 if (messageId) {
@@ -206,7 +324,7 @@ if (messageId) {
   try {
 
     Api.editMessageText({
-      chat_id: uid,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -220,7 +338,7 @@ if (messageId) {
     try {
 
       Api.deleteMessage({
-        chat_id: uid,
+        chat_id: chatId,
         message_id: messageId
       })
 
@@ -229,7 +347,7 @@ if (messageId) {
     }
 
     Api.sendMessage({
-      chat_id: uid,
+      chat_id: chatId,
       text: text,
       parse_mode: "HTML",
       reply_markup: {
@@ -239,10 +357,17 @@ if (messageId) {
 
   }
 
-} else {
+}
+
+
+// ==========================================
+// 📩 DIRECT COMMAND MESSAGE
+// ==========================================
+
+else {
 
   Api.sendMessage({
-    chat_id: uid,
+    chat_id: chatId,
     text: text,
     parse_mode: "HTML",
     reply_markup: {
