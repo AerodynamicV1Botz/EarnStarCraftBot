@@ -16,239 +16,175 @@
   group: 
 CMD*/
 
-// ==========================================
+/*CMD
+  command: MENU_BUILD
+  need_reply: false
+  folder: Build Menu
+*/
+
+// =====================================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 194 — UPDATED VERSION
-// COMMAND NAME: MENU_BUILD
-// STEP 7 — BUILD MY BOT
-// 📁 Build Menu
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ✅ Same Message Edit + Delete Fallback
-// ==========================================
+// SCRIPT 194 — MENU_BUILD
+// STEP 7
+// BUILD MY BOT INTRODUCTION MENU
+// =====================================================
 
-var uid = user.telegramid
 
-var userData = Bot.getProperty("USER_" + uid) || {}
-var lang = userData.language || "hinglish"
+// =====================================================
+// 👤 USER DATA
+// =====================================================
 
-var text = ""
-var buttons = []
+var uid = String(user.telegramid);
 
-// ==========================================
+var userData =
+  Bot.getProperty("USER_" + uid) || {};
+
+var lang =
+  userData.language || "hinglish";
+
+
+// =====================================================
+// 🌐 TEXT
+// =====================================================
+
+var text = "";
+
+
+// =====================================================
 // 🇬🇧 ENGLISH
-// ==========================================
+// =====================================================
 
 if (lang == "english") {
+
   text =
     "🚀 <b>BUILD MY BOT</b>\n\n" +
-    "💎 Ready to turn your idea into a Telegram bot?\n\n" +
-    "Tell us what you need and our team will review your requirements.\n\n" +
-    "✨ <b>We can build:</b>\n" +
-    "• 🤖 Custom Telegram Bots\n" +
-    "• ⚙️ Business Automation\n" +
-    "• 💬 Customer Support Systems\n" +
-    "• 📢 Broadcast Systems\n" +
-    "• 👥 Community Management\n" +
-    "• 📝 Lead Collection Systems\n" +
-    "• 🛠️ Custom Solutions\n\n" +
-    "📋 <b>What happens next?</b>\n" +
-    "1️⃣ Choose your project type\n" +
-    "2️⃣ Tell us your requirements\n" +
-    "3️⃣ Our team reviews your request\n" +
-    "4️⃣ We discuss features & pricing\n" +
-    "5️⃣ Development starts after confirmation\n\n" +
-    "🔐 Your enquiry will be handled professionally.\n\n" +
-    "👇 Choose an option below."
 
-  buttons = [
-    [
-      {
-        text: "🤖 Custom Bot",
-        callback_data: "BUILD_CUSTOM"
-      },
-      {
-        text: "⚙️ Automation",
-        callback_data: "BUILD_AUTOMATION"
-      }
-    ],
-    [
-      {
-        text: "💬 Support Bot",
-        callback_data: "BUILD_SUPPORT"
-      },
-      {
-        text: "📢 Broadcast",
-        callback_data: "BUILD_BROADCAST"
-      }
-    ],
-    [
-      {
-        text: "👥 Community",
-        callback_data: "BUILD_COMMUNITY"
-      },
-      {
-        text: "📝 Lead System",
-        callback_data: "BUILD_LEAD"
-      }
-    ],
-    [
-      {
-        text: "💎 Custom Project",
-        callback_data: "BUILD_PROJECT"
-      }
-    ],
-    [
-      {
-        text: "💰 View Pricing",
-        callback_data: "MENU_PRICING"
-      }
-    ],
-    [
-      {
-        text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
-      }
-    ]
-  ]
+    "💎 Have an idea for a Telegram bot?\n\n" +
 
-// ==========================================
-// 🇬🇺 GUJARATI
-// ==========================================
+    "We can help turn your idea into a custom Telegram bot according to your requirements.\n\n" +
+
+    "🛠️ We can build different types of bots, including business automation, customer support, broadcast, community management, referral, booking, enquiry and other custom solutions.\n\n" +
+
+    "💡 <b>Have a different or unique idea?</b>\n\n" +
+
+    "No problem. You can explain your idea to us, even if you are not sure how it should work. Our team will understand your concept, suggest a suitable solution and discuss how it can be developed.\n\n" +
+
+    "🔍 <b>Have an example or reference bot?</b>\n\n" +
+
+    "You can share an example bot, screenshot, video or explain its working process. We can study it and create a similar or improved custom bot according to your needs.\n\n" +
+
+    "📨 Start your enquiry and share your idea with our team. We will review it and contact you to discuss the next steps.\n\n" +
+
+    "🔐 <b>Your enquiry will be handled professionally.</b>\n\n" +
+
+    "👇 <b>Choose an option</b>";
+
+
+// =====================================================
+// 🇮🇳 HINGLISH
+// =====================================================
+
+} else if (lang == "hinglish") {
+
+  text =
+    "🚀 <b>BUILD MY BOT</b>\n\n" +
+
+    "💎 Kya aapke paas Telegram bot banane ka koi idea hai?\n\n" +
+
+    "Hum aapke idea ko aapki requirements ke according ek custom Telegram bot mein convert karne mein help kar sakte hain.\n\n" +
+
+    "🛠️ Hum business automation, customer support, broadcast, community management, referral, booking, enquiry aur other custom solutions jaise alag-alag type ke bots bana sakte hain.\n\n" +
+
+    "💡 <b>Aapke paas koi alag ya unique idea hai?</b>\n\n" +
+
+    "Koi problem nahi. Agar aapko ye bhi clear nahi hai ki bot kaise work karega, toh bhi aap apna idea humein explain kar sakte ho. Hamari team aapka concept samjhegi, suitable solution suggest karegi aur discuss karegi ki usko kaise develop kiya ja sakta hai.\n\n" +
+
+    "🔍 <b>Kya aapke paas example ya reference bot hai?</b>\n\n" +
+
+    "Aap koi example bot, screenshot, video ya uska working process share kar sakte ho. Hum usko study karke aapki requirements ke according similar ya improved custom bot bana sakte hain.\n\n" +
+
+    "📨 Apni enquiry start karo aur apna idea hamari team ke saath share karo. Hum usko review karke next steps discuss karne ke liye aapse contact karenge.\n\n" +
+
+    "🔐 <b>Aapki enquiry professionally handle ki jayegi.</b>\n\n" +
+
+    "👇 <b>Option choose karo</b>";
+
+
+// =====================================================
+// 🇮🇳 GUJARATI
+// =====================================================
 
 } else if (lang == "gujarati") {
+
   text =
     "🚀 <b>BUILD MY BOT</b>\n\n" +
-    "💎 તમારી idea ને Telegram bot માં convert કરવા ready છો?\n\n" +
-    "તમારી requirements મોકલો અને અમારી team તેને review કરશે.\n\n" +
-    "✨ <b>અમે બનાવી શકીએ છીએ:</b>\n" +
-    "• 🤖 Custom Telegram Bots\n" +
-    "• ⚙️ Business Automation\n" +
-    "• 💬 Customer Support Systems\n" +
-    "• 📢 Broadcast Systems\n" +
-    "• 👥 Community Management\n" +
-    "• 📝 Lead Collection Systems\n" +
-    "• 🛠️ Custom Solutions\n\n" +
-    "📋 <b>આગળ શું થશે?</b>\n" +
-    "1️⃣ Project type પસંદ કરો\n" +
-    "2️⃣ તમારી requirements જણાવો\n" +
-    "3️⃣ અમારી team request review કરશે\n" +
-    "4️⃣ Features અને pricing discuss થશે\n" +
-    "5️⃣ Confirmation પછી development શરૂ થશે\n\n" +
-    "🔐 તમારી enquiry professionally handle કરવામાં આવશે.\n\n" +
-    "👇 નીચે option પસંદ કરો."
 
-  buttons = [
-    [
-      {
-        text: "🤖 Custom Bot",
-        callback_data: "BUILD_CUSTOM"
-      },
-      {
-        text: "⚙️ Automation",
-        callback_data: "BUILD_AUTOMATION"
-      }
-    ],
-    [
-      {
-        text: "💬 Support Bot",
-        callback_data: "BUILD_SUPPORT"
-      },
-      {
-        text: "📢 Broadcast",
-        callback_data: "BUILD_BROADCAST"
-      }
-    ],
-    [
-      {
-        text: "👥 Community",
-        callback_data: "BUILD_COMMUNITY"
-      },
-      {
-        text: "📝 Lead System",
-        callback_data: "BUILD_LEAD"
-      }
-    ],
-    [
-      {
-        text: "💎 Custom Project",
-        callback_data: "BUILD_PROJECT"
-      }
-    ],
-    [
-      {
-        text: "💰 Pricing",
-        callback_data: "MENU_PRICING"
-      }
-    ],
-    [
-      {
-        text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
-      }
-    ]
-  ]
+    "💎 Shu tamari pase Telegram bot banavvano koi idea chhe?\n\n" +
 
-// ==========================================
-// 🇮🇳 HINGLISH
-// ==========================================
+    "Ame tamara idea ne tamari requirements pramane custom Telegram bot ma convert karvama madad kari shakiye chhiye.\n\n" +
+
+    "🛠️ Ame business automation, customer support, broadcast, community management, referral, booking, enquiry ane other custom solutions jeva alag-alag prakaarna bots banavi shakiye chhiye.\n\n" +
+
+    "💡 <b>Tamari pase koi alag athva unique idea chhe?</b>\n\n" +
+
+    "Koi problem nathi. Jo tamne bot kevi rite work karse te clear na hoy, to pan tame tamaro idea amne explain kari shako cho. Amari team tamaro concept samjhi ne suitable solution suggest karse ane tene kevi rite develop kari shakay te discuss karse.\n\n" +
+
+    "🔍 <b>Tamari pase example athva reference bot chhe?</b>\n\n" +
+
+    "Tame koi example bot, screenshot, video athva tena working process share kari shako cho. Ame tene study kari ne tamari requirements pramane similar athva improved custom bot banavi shakiye chhiye.\n\n" +
+
+    "📨 Tamari enquiry start karo ane tamaro idea amari team sathe share karo. Ame tene review kari ne next steps discuss karva mate tamaro contact karishu.\n\n" +
+
+    "🔐 <b>Tamari enquiry professionally handle karvama aavshe.</b>\n\n" +
+
+    "👇 <b>Option pasand karo</b>";
+
+
+// =====================================================
+// 🌐 FALLBACK
+// =====================================================
 
 } else {
+
   text =
     "🚀 <b>BUILD MY BOT</b>\n\n" +
-    "💎 Apni idea ko Telegram bot mein convert karne ke liye ready ho?\n\n" +
-    "Apni requirements bhejo aur hamari team unhe review karegi.\n\n" +
-    "✨ <b>Hum bana sakte hain:</b>\n" +
-    "• 🤖 Custom Telegram Bots\n" +
-    "• ⚙️ Business Automation\n" +
-    "• 💬 Customer Support Systems\n" +
-    "• 📢 Broadcast Systems\n" +
-    "• 👥 Community Management\n" +
-    "• 📝 Lead Collection Systems\n" +
-    "• 🛠️ Custom Solutions\n\n" +
-    "📋 <b>Next kya hoga?</b>\n" +
-    "1️⃣ Project type choose karo\n" +
-    "2️⃣ Apni requirements batao\n" +
-    "3️⃣ Hamari team request review karegi\n" +
-    "4️⃣ Features & pricing discuss hoga\n" +
-    "5️⃣ Confirmation ke baad development start hoga\n\n" +
-    "🔐 Aapki enquiry professionally handle ki jayegi.\n\n" +
-    "👇 Neeche option choose karo."
+
+    "💎 Kya aapke paas Telegram bot banane ka koi idea hai?\n\n" +
+
+    "Hum aapke idea ko aapki requirements ke according ek custom Telegram bot mein convert karne mein help kar sakte hain.\n\n" +
+
+    "🛠️ Hum business automation, customer support, broadcast, community management, referral, booking, enquiry aur other custom solutions jaise alag-alag type ke bots bana sakte hain.\n\n" +
+
+    "💡 <b>Aapke paas koi alag ya unique idea hai?</b>\n\n" +
+
+    "Koi problem nahi. Agar aapko ye bhi clear nahi hai ki bot kaise work karega, toh bhi aap apna idea humein explain kar sakte ho. Hamari team aapka concept samjhegi, suitable solution suggest karegi aur discuss karegi ki usko kaise develop kiya ja sakta hai.\n\n" +
+
+    "🔍 <b>Kya aapke paas example ya reference bot hai?</b>\n\n" +
+
+    "Aap koi example bot, screenshot, video ya uska working process share kar sakte ho. Hum usko study karke aapki requirements ke according similar ya improved custom bot bana sakte hain.\n\n" +
+
+    "📨 Apni enquiry start karo aur apna idea hamari team ke saath share karo. Hum usko review karke next steps discuss karne ke liye aapse contact karenge.\n\n" +
+
+    "🔐 <b>Aapki enquiry professionally handle ki jayegi.</b>\n\n" +
+
+    "👇 <b>Option choose karo</b>";
+
+}
+
+
+// =====================================================
+// 🔘 BUTTONS
+// =====================================================
+
+var buttons = [];
+
+if (lang == "english") {
 
   buttons = [
     [
       {
-        text: "🤖 Custom Bot",
-        callback_data: "BUILD_CUSTOM"
-      },
-      {
-        text: "⚙️ Automation",
-        callback_data: "BUILD_AUTOMATION"
-      }
-    ],
-    [
-      {
-        text: "💬 Support Bot",
-        callback_data: "BUILD_SUPPORT"
-      },
-      {
-        text: "📢 Broadcast",
-        callback_data: "BUILD_BROADCAST"
-      }
-    ],
-    [
-      {
-        text: "👥 Community",
-        callback_data: "BUILD_COMMUNITY"
-      },
-      {
-        text: "📝 Lead System",
-        callback_data: "BUILD_LEAD"
-      }
-    ],
-    [
-      {
-        text: "💎 Custom Project",
-        callback_data: "BUILD_PROJECT"
+        text: "📋 Start Enquiry",
+        callback_data: "BUILD_ENQUIRY"
       }
     ],
     [
@@ -260,62 +196,155 @@ if (lang == "english") {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
-  ]
+  ];
+
+} else {
+
+  buttons = [
+    [
+      {
+        text: "📋 Enquiry Start Karo",
+        callback_data: "BUILD_ENQUIRY"
+      }
+    ],
+    [
+      {
+        text: "💰 Pricing",
+        callback_data: "MENU_PRICING"
+      }
+    ],
+    [
+      {
+        text: "🏠 Main Menu",
+        callback_data: "MAIN_MENU"
+      }
+    ]
+  ];
+
 }
 
-// ==========================================
-// 🔔 CALLBACK ANSWER
-// ==========================================
+
+// =====================================================
+// 🔘 ANSWER CALLBACK
+// =====================================================
+
+if (request.message) {
+
+  try {
+
+    Api.answerCallbackQuery({
+      callback_query_id: request.id,
+      text: "Build My Bot"
+    });
+
+  } catch (e) {}
+
+}
+
+
+// =====================================================
+// ✏️ CURRENT MESSAGE ID
+// =====================================================
+
+var currentMessageId = null;
 
 if (
-  typeof request !== "undefined" &&
-  request &&
-  request.id
-) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
-}
-
-// ==========================================
-// 📤 SEND / EDIT BUILD MENU
-// ==========================================
-
-var replyMarkup = {
-  inline_keyboard: buttons
-}
-
-if (
-  typeof request !== "undefined" &&
   request.message &&
   request.message.message_id
 ) {
-  try {
-    Api.editMessageText({
-      chat_id: uid,
-      message_id: request.message.message_id,
-      text: text,
-      parse_mode: "HTML",
-      reply_markup: replyMarkup
-    })
 
-    return
-  } catch (error) {
-    try {
-      Api.deleteMessage({
-        chat_id: uid,
-        message_id: request.message.message_id
-      })
-    } catch (deleteError) {}
-  }
+  currentMessageId =
+    request.message.message_id;
+
+} else if (
+  request.message &&
+  request.message.messageId
+) {
+
+  currentMessageId =
+    request.message.messageId;
+
 }
 
-Api.sendMessage({
-  chat_id: uid,
-  text: text,
-  parse_mode: "HTML",
-  reply_markup: replyMarkup
-})
+
+// =====================================================
+// 🔄 EDIT EXISTING MESSAGE
+// =====================================================
+
+var edited = false;
+
+if (currentMessageId) {
+
+  try {
+
+    Api.editMessageText({
+      chat_id: uid,
+      message_id: currentMessageId,
+      text: text,
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: buttons
+      }
+    });
+
+    edited = true;
+
+  } catch (e) {
+
+    edited = false;
+
+  }
+
+}
+
+
+// =====================================================
+// 🗑️ FALLBACK: DELETE OLD MESSAGE
+// =====================================================
+
+if (!edited && currentMessageId) {
+
+  try {
+
+    Api.deleteMessage({
+      chat_id: uid,
+      message_id: currentMessageId
+    });
+
+  } catch (e) {
+
+    try {
+
+      Bot.deleteMessage(currentMessageId);
+
+    } catch (e2) {}
+
+  }
+
+}
+
+
+// =====================================================
+// 📩 FALLBACK: SEND NEW MESSAGE
+// =====================================================
+
+if (!edited) {
+
+  Api.sendMessage({
+    chat_id: uid,
+    text: text,
+    parse_mode: "HTML",
+    reply_markup: {
+      inline_keyboard: buttons
+    }
+  });
+
+}
+
+
+// =====================================================
+// ✅ END SCRIPT 194
+// =====================================================

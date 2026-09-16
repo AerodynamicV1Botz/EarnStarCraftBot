@@ -16,141 +16,207 @@
   group: 
 CMD*/
 
-// ==========================================
+/*CMD
+  command: ORDER_BUSINESS
+  need_reply: false
+  folder: ORDERS
+*/
+
+// =====================================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 26 — UPDATED VERSION
-// COMMAND NAME: ORDER_BUSINESS
-// STEP 4.2.1 — BUSINESS REQUEST START
-// 📁 MAIN MENU → 📁 PRICING → BUSINESS PACKAGE → BUILD MY BOT
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ==========================================
+// SCRIPT 26 — ORDER_BUSINESS
+// STEP 4.2.1 — BUSINESS PACKAGE ORDER
+// =====================================================
 
 
-// ==========================================
-// ⚡ INSTANT CALLBACK RESPONSE
-// ==========================================
+// =====================================================
+// ⚡ CALLBACK RESPONSE
+// =====================================================
+
+if (typeof request !== "undefined" && request && request.id) {
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    });
+  } catch (error) {}
+}
+
+
+// =====================================================
+// 👤 USER DETAILS
+// =====================================================
+
+var uid = String(user.telegramid);
+
+var userData = Bot.getProperty("USER_" + uid);
+
+if (!userData || typeof userData !== "object" || Array.isArray(userData)) {
+  userData = {};
+}
+
+
+// =====================================================
+// 🌐 LANGUAGE
+// =====================================================
+
+var language = userData.language || "hinglish";
 
 if (
-  typeof request !== "undefined" &&
-  request &&
-  request.id
+  language !== "hinglish" &&
+  language !== "english" &&
+  language !== "gujarati"
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  language = "hinglish";
 }
 
 
-// ==========================================
-// 👤 USER ID & LANGUAGE
-// ==========================================
+// =====================================================
+// 📝 USER ACTIVITY
+// =====================================================
 
-var uid = user.telegramid
+var now = new Date().toISOString();
 
-var userData = Bot.getProperty("USER_" + uid) || {}
+userData.lastCommand = "ORDER_BUSINESS";
+userData.lastVisitedAt = now;
+userData.updatedAt = now;
 
-var lang = userData.language || "hinglish"
+Bot.setProperty("USER_" + uid, userData, "json");
 
 
-// ==========================================
-// 📝 BUSINESS REQUEST MODE
-// ==========================================
+// =====================================================
+// 👤 TELEGRAM PROFILE
+// =====================================================
+
+var fullName = String(user.first_name || "");
+
+if (user.last_name) {
+  fullName += " " + String(user.last_name);
+}
+
+fullName = fullName.trim() || "Telegram User";
+
+var telegramUsername = "";
+
+if (user.username) {
+  telegramUsername = "@" + String(user.username);
+}
+
+var premiumStatus = "Not Active";
+
+if (user.is_premium === true) {
+  premiumStatus = "Active";
+}
+
+
+// =====================================================
+// 📦 CREATE BUSINESS ORDER DRAFT
+// =====================================================
+
+var draft = {
+  id: "",
+  orderId: "",
+
+  userId: uid,
+
+  orderSource: "PACKAGE",
+  source: "PACKAGE",
+
+  packageType: "business",
+  packageName: "Business Package",
+  packageStep: "4.2",
+  packagePrice: "1499",
+
+  packageDetails: "",
+
+  advanceAmount: "",
+  remainingAmount: "",
+
+  telegramProfile: {
+    fullName: fullName,
+    telegramId: uid,
+    username: telegramUsername,
+    isPremium: premiumStatus
+  },
+
+  clientInfo: {
+    customName: ""
+  },
+
+  contacts: {
+    telegram: "",
+    otherNumber: "",
+    instagram: "",
+    whatsapp: "",
+    email: ""
+  },
+
+  requirements: "",
+  budget: "",
+  extraDetails: "",
+
+  stage: "contact_menu",
+
+  requestStatus: "draft",
+  orderStatus: "pending_review",
+  paymentStatus: "not_requested",
+  submissionStatus: "draft",
+
+  progress: 0,
+  progressTitle: "Order Started",
+  progressUpdate: "",
+
+  adminId: "",
+  adminNote: "",
+
+  createdAt: now,
+  updatedAt: now,
+
+  acceptedAt: "",
+  advanceRequestedAt: "",
+  advancePaidAt: "",
+  startedAt: "",
+  completedAt: "",
+  remainingRequestedAt: "",
+  remainingPaidAt: "",
+  deliveredAt: "",
+  submittedAt: ""
+};
+
+
+// =====================================================
+// 💾 SAVE ACTIVE PACKAGE DRAFT
+// =====================================================
 
 Bot.setProperty(
-  "BUSINESS_MODE_" + uid,
-  "waiting",
+  "ORDER_" + uid,
+  draft,
+  "json"
+);
+
+draft.directOrderKey = "DIRECT_ORDER_BUSINESS_" + uid;
+
+// =====================================================
+// 🔐 ACTIVE SOURCE
+// =====================================================
+
+Bot.setProperty(
+  "ORDER_ACTIVE_SOURCE_" + uid,
+  "PACKAGE",
   "string"
-)
+);
 
 
-// ==========================================
-// 📤 REQUEST FORM TEXT
-// ==========================================
+// =====================================================
+// 🧹 CLEAR OLD TEMPORARY DATA
+// =====================================================
 
-var text = ""
-
-if (lang === "english") {
-
-  text =
-    "🔵 <b>BUSINESS BOT REQUEST</b>\n\n" +
-    "💰 <b>Starting Price: ₹1,499+</b>\n\n" +
-    "You are submitting a request for the Business Bot Package.\n\n" +
-    "✨ <b>Includes:</b>\n" +
-    "• Advanced menu & navigation\n" +
-    "• User management system\n" +
-    "• Broadcast & notifications\n" +
-    "• Admin controls\n" +
-    "• Automated forms / lead collection\n" +
-    "• Custom business features\n\n" +
-    "📝 <b>Send your requirements in one message:</b>\n\n" +
-    "• Bot name\n" +
-    "• Bot purpose\n" +
-    "• Required features\n" +
-    "• Language\n" +
-    "• Special buttons/design\n\n" +
-    "✍️ Now type and send your requirements."
+Bot.setProperty("ORDER_MODE_" + uid, "", "string");
+Bot.setProperty("ORDER_PACKAGE_" + uid, "", "string");
+Bot.setProperty("BUSINESS_MODE_" + uid, "", "string");
 
 
-} else if (lang === "gujarati") {
+// =====================================================
+// ➡️ NEXT STEP
+// =====================================================
 
-  text =
-    "🔵 <b>બિઝનેસ બોટ રિક્વેસ્ટ</b>\n\n" +
-    "💰 <b>શરૂઆતની કિંમત: ₹1,499+</b>\n\n" +
-    "તમે Business Bot Package માટે request submit કરી રહ્યા છો.\n\n" +
-    "✨ <b>આમાં મળશે:</b>\n" +
-    "• Advanced menu અને navigation\n" +
-    "• User management system\n" +
-    "• Broadcast અને notifications\n" +
-    "• Admin controls\n" +
-    "• Automated forms / lead collection\n" +
-    "• Custom business features\n\n" +
-    "📝 <b>તમારી requirements એક જ message માં મોકલો:</b>\n\n" +
-    "• Bot નું નામ\n" +
-    "• Bot નો purpose\n" +
-    "• Required features\n" +
-    "• Language\n" +
-    "• Special buttons/design\n\n" +
-    "✍️ હવે તમારી requirements type કરીને મોકલો."
-
-
-} else {
-
-  text =
-    "🔵 <b>BUSINESS BOT REQUEST</b>\n\n" +
-    "💰 <b>Starting Price: ₹1,499+</b>\n\n" +
-    "Aap Business Bot Package ke liye request submit kar rahe ho.\n\n" +
-    "✨ <b>Includes:</b>\n" +
-    "• Advanced menu & navigation\n" +
-    "• User management system\n" +
-    "• Broadcast & notifications\n" +
-    "• Admin controls\n" +
-    "• Automated forms / lead collection\n" +
-    "• Custom business features\n\n" +
-    "📝 <b>Apni requirements ek message mein bhejo:</b>\n\n" +
-    "• Bot ka naam\n" +
-    "• Bot ka purpose\n" +
-    "• Required features\n" +
-    "• Language\n" +
-    "• Special buttons/design\n\n" +
-    "✍️ Ab apna message type karke bhejo."
-
-}
-
-
-// ==========================================
-// 📤 SEND REQUEST FORM
-// ==========================================
-
-Api.sendMessage({
-  chat_id: uid,
-  text: text,
-  parse_mode: "HTML"
-})
-
-
-// ==========================================
-// ➡️ NEXT COMMAND
-// ==========================================
-
-Bot.runCommand("BUSINESS_REQUEST_TEXT")
+Bot.runCommand("ORDER_CONTACT_MENU");

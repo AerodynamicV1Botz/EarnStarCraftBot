@@ -52,7 +52,6 @@ if (lang === "gu") {
 // ==========================================
 
 if (lang === "hinglish") {
-
   text =
     "❓ <b>FREQUENTLY ASKED QUESTIONS</b>\n\n" +
     "━━━━━━━━━━━━━━━━━━\n\n" +
@@ -109,19 +108,16 @@ if (lang === "hinglish") {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
-
 }
 
 // ==========================================
 // ❓ FAQ — ENGLISH
 // ==========================================
-
 else if (lang === "english") {
-
   text =
     "❓ <b>FREQUENTLY ASKED QUESTIONS</b>\n\n" +
     "━━━━━━━━━━━━━━━━━━\n\n" +
@@ -178,19 +174,16 @@ else if (lang === "english") {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
-
 }
 
 // ==========================================
 // ❓ FAQ — GUJARATI
 // ==========================================
-
 else if (lang === "gujarati") {
-
   text =
     "❓ <b>વારંવાર પૂછાતા પ્રશ્નો</b>\n\n" +
     "━━━━━━━━━━━━━━━━━━\n\n" +
@@ -247,22 +240,17 @@ else if (lang === "gujarati") {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
-
 }
 
 // ==========================================
 // 🔄 UNKNOWN LANGUAGE FALLBACK
 // ==========================================
-
 else {
-
-  text =
-    "❓ <b>FAQ</b>\n\n" +
-    "Please choose your preferred language first."
+  text = "❓ <b>FAQ</b>\n\n" + "Please choose your preferred language first."
 
   buttons = [
     [
@@ -274,11 +262,10 @@ else {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
-
 }
 
 // ==========================================
@@ -296,15 +283,12 @@ if (typeof request !== "undefined" && request && request.id) {
 // ==========================================
 
 function showMenu(messageText, keyboard) {
-
   if (
     typeof request !== "undefined" &&
     request.message &&
     request.message.message_id
   ) {
-
     try {
-
       Api.editMessageText({
         chat_id: uid,
         message_id: request.message.message_id,
@@ -316,20 +300,14 @@ function showMenu(messageText, keyboard) {
       })
 
       return
-
     } catch (error) {
-
       try {
-
         Api.deleteMessage({
           chat_id: uid,
           message_id: request.message.message_id
         })
-
       } catch (deleteError) {}
-
     }
-
   }
 
   Api.sendMessage({
@@ -340,7 +318,7 @@ function showMenu(messageText, keyboard) {
       inline_keyboard: keyboard
     }
   })
-
 }
 
 showMenu(text, buttons)
+

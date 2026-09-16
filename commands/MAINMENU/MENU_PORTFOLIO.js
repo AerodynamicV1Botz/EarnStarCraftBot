@@ -34,11 +34,7 @@ var lang = userData.language || "hinglish"
 // 🔔 CALLBACK ANSWER
 // ==========================================
 
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.id
-) {
+if (typeof request !== "undefined" && request && request.id) {
   Api.answerCallbackQuery({
     callback_query_id: request.id
   })
@@ -179,12 +175,6 @@ var buttons = [
   ],
   [
     {
-      text: liveDemos,
-      callback_data: "MENU_DEMO"
-    }
-  ],
-  [
-    {
       text: buildBot,
       callback_data: "MENU_BUILD"
     }
@@ -192,7 +182,7 @@ var buttons = [
   [
     {
       text: mainMenu,
-      callback_data: "BACK_MAIN_MENU"
+      callback_data: "MAIN_MENU"
     }
   ]
 ]
@@ -244,3 +234,4 @@ function showPortfolioMenu(messageText, inlineButtons) {
 // ==========================================
 
 showPortfolioMenu(text, buttons)
+

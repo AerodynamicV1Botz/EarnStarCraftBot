@@ -16,18 +16,24 @@
   group: 
 CMD*/
 
-// ==========================================
-// 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 36 — UPDATED VERSION
-// COMMAND NAME: PRICE_PRO
-// STEP 4.3 — PROFESSIONAL PACKAGE
-// 📁 MAIN MENU → 📁 PRICING → PROFESSIONAL PACKAGE
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ==========================================
+/*CMD
+  command: PRICE_PRO
+  need_reply: false
+  folder: PRICING
+*/
 
 // ==========================================
-// ⚡ INSTANT CALLBACK RESPONSE
+// 🤖 EARNSTAR BOTCRAFT
+// SCRIPT 36 — PRICE_PRO
+// STEP 4.3 — PROFESSIONAL PACKAGE
+// PURPOSE: Show Professional package details and order options
+// CONNECTIONS: MENU_PRICING → PRICE_PRO
+// NEXT: ORDER_PRO / MY_ORDERS / MENU_DEMO / PRICE_CUSTOM
+// ==========================================
+
+
+// ==========================================
+// ⚡ CALLBACK RESPONSE
 // ==========================================
 
 if (
@@ -35,31 +41,106 @@ if (
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback errors
+  }
 }
 
+
 // ==========================================
-// 🆔 GET USER & LANGUAGE
+// 👤 USER DATA
 // ==========================================
 
-var uid = user.telegramid
+var uid = String(user.telegramid)
 
 var userData = Bot.getProperty(
   "USER_" + uid
-) || {}
+)
 
-var lang =
-  userData.language || "hinglish"
+if (
+  !userData ||
+  typeof userData !== "object" ||
+  Array.isArray(userData)
+) {
+  userData = {}
+}
+
+
+// ==========================================
+// 🌐 LANGUAGE
+// ==========================================
+
+var lang = userData.language || "hinglish"
+
+if (
+  lang !== "hinglish" &&
+  lang !== "english" &&
+  lang !== "gujarati"
+) {
+  lang = "hinglish"
+}
+
+
+// ==========================================
+// 📝 USER ACTIVITY
+// ==========================================
+
+var now = new Date().toISOString()
+
+userData.lastCommand = "PRICE_PRO"
+userData.lastVisitedAt = now
+userData.updatedAt = now
+
+Bot.setProperty(
+  "USER_" + uid,
+  userData,
+  "json"
+)
+
+
+// ==========================================
+// 💬 CHAT ID + MESSAGE ID
+// ==========================================
+
+var chatId = uid
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message
+) {
+  if (
+    request.message.chat &&
+    request.message.chat.id
+  ) {
+    chatId = request.message.chat.id
+  }
+
+  if (request.message.message_id) {
+    messageId = request.message.message_id
+  }
+}
+
 
 // ==========================================
 // 📝 PACKAGE TEXT
 // ==========================================
 
 var text = ""
+var buttons = []
+
+
+// ==========================================
+// 🇬🇧 ENGLISH
+// ==========================================
 
 if (lang === "english") {
+
   text =
     "🟣 <b>PROFESSIONAL PACKAGE</b>\n\n" +
     "💰 <b>Starting Price: ₹2,999+</b>\n\n" +
@@ -83,7 +164,47 @@ if (lang === "english") {
     "💎 Need a fully customized solution?\n" +
     "Tap <b>Build My Bot</b> and tell us your requirements."
 
-} else if (lang === "gujarati") {
+
+  buttons = [
+    [
+      {
+        text: "🚀 Build My Bot",
+        callback_data: "ORDER_PRO"
+      }
+    ],
+    [
+      {
+        text: "📦 My Orders",
+        callback_data: "MY_ORDERS"
+      }
+    ],
+    [
+      {
+        text: "🎬 Live Demo",
+        callback_data: "MENU_DEMO"
+      },
+      {
+        text: "💎 Custom Package",
+        callback_data: "PRICE_CUSTOM"
+      }
+    ],
+    [
+      {
+        text: "💰 All Pricing",
+        callback_data: "MENU_PRICING"
+      }
+    ]
+  ]
+
+}
+
+
+// ==========================================
+// 🇬🇺 GUJARATI
+// ==========================================
+
+else if (lang === "gujarati") {
+
   text =
     "🟣 <b>પ્રોફેશનલ પેકેજ</b>\n\n" +
     "💰 <b>શરૂઆતની કિંમત: ₹2,999+</b>\n\n" +
@@ -107,7 +228,47 @@ if (lang === "english") {
     "💎 Fully customized solution જોઈએ છે?\n" +
     "<b>Build My Bot</b> પર tap કરીને requirements મોકલો."
 
-} else {
+
+  buttons = [
+    [
+      {
+        text: "🚀 Bot બનાવો",
+        callback_data: "ORDER_PRO"
+      }
+    ],
+    [
+      {
+        text: "📦 My Orders",
+        callback_data: "MY_ORDERS"
+      }
+    ],
+    [
+      {
+        text: "🎬 Live Demo",
+        callback_data: "MENU_DEMO"
+      },
+      {
+        text: "💎 Custom Package",
+        callback_data: "PRICE_CUSTOM"
+      }
+    ],
+    [
+      {
+        text: "💰 બધા Pricing",
+        callback_data: "MENU_PRICING"
+      }
+    ]
+  ]
+
+}
+
+
+// ==========================================
+// 🇮🇳 HINGLISH
+// ==========================================
+
+else {
+
   text =
     "🟣 <b>PROFESSIONAL PACKAGE</b>\n\n" +
     "💰 <b>Starting Price: ₹2,999+</b>\n\n" +
@@ -130,62 +291,52 @@ if (lang === "english") {
     "⚠️ API integrations, external services ya highly advanced features ke liye extra charges ho sakte hain.\n\n" +
     "💎 Fully customized solution chahiye?\n" +
     "<b>Build My Bot</b> par tap karke apni requirements bhejo."
-}
 
-// ==========================================
-// 🔘 BUTTONS
-// ==========================================
 
-var buttons = [
-  [
-    {
-      text: "🚀 Build My Bot",
-      callback_data: "ORDER_PRO"
-    }
-  ],
-  [
-    {
-      text: "📋 My Professional Requests",
-      callback_data: "MY_PRO_REQUESTS"
-    }
-  ],
-  [
-    {
-      text: "🎬 Live Demo",
-      callback_data: "MENU_DEMO"
-    },
-    {
-      text: "💎 Custom Package",
-      callback_data: "PRICE_CUSTOM"
-    }
-  ],
-  [
-    {
-      text: "💰 All Pricing",
-      callback_data: "MENU_PRICING"
-    }
+  buttons = [
+    [
+      {
+        text: "🚀 Build My Bot",
+        callback_data: "ORDER_PRO"
+      }
+    ],
+    [
+      {
+        text: "📦 My Orders",
+        callback_data: "MY_ORDERS"
+      }
+    ],
+    [
+      {
+        text: "🎬 Live Demo",
+        callback_data: "MENU_DEMO"
+      },
+      {
+        text: "💎 Custom Package",
+        callback_data: "PRICE_CUSTOM"
+      }
+    ],
+    [
+      {
+        text: "💰 All Pricing",
+        callback_data: "MENU_PRICING"
+      }
+    ]
   ]
-]
 
-// ==========================================
-// 🖼️ SAME MESSAGE EDIT / FALLBACK
-// ==========================================
-
-var messageId = null
-
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
 }
+
+
+// ==========================================
+// ✏️ SAME MESSAGE EDIT / FALLBACK
+// ==========================================
 
 if (messageId) {
+
   try {
+
     Api.editMessageText({
-      chat_id: uid,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -193,30 +344,40 @@ if (messageId) {
         inline_keyboard: buttons
       }
     })
+
   } catch (error) {
+
     try {
+
       Api.deleteMessage({
-        chat_id: uid,
+        chat_id: chatId,
         message_id: messageId
       })
-    } catch (deleteError) {}
+
+    } catch (deleteError) {
+      // Ignore delete error
+    }
 
     Api.sendMessage({
-      chat_id: uid,
+      chat_id: chatId,
       text: text,
       parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: buttons
       }
     })
+
   }
+
 } else {
+
   Api.sendMessage({
-    chat_id: uid,
+    chat_id: chatId,
     text: text,
     parse_mode: "HTML",
     reply_markup: {
       inline_keyboard: buttons
     }
   })
+
 }

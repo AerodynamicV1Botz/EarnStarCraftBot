@@ -16,128 +16,206 @@
   group: 
 CMD*/
 
-// ==========================================
-// 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 15 — UPDATED VERSION
-// COMMAND NAME: ORDER_STARTER
-// STEP 4.1.1 — STARTER ORDER REQUEST
-// 📁 MAIN MENU → 📁 PRICING → STARTER PACKAGE
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ==========================================
+/*CMD
+  command: ORDER_STARTER
+  need_reply: false
+  folder: ORDERS
+*/
 
-// ==========================================
-// ⚡ INSTANT CALLBACK RESPONSE
-// ==========================================
+// =====================================================
+// 🤖 EARNSTAR BOTCRAFT
+// SCRIPT 15 — ORDER_STARTER
+// STEP 2.2.1.1 — STARTER PACKAGE ORDER
+// =====================================================
+
+
+// =====================================================
+// ⚡ CALLBACK RESPONSE
+// =====================================================
+
+if (typeof request !== "undefined" && request && request.id) {
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    });
+  } catch (error) {}
+}
+
+
+// =====================================================
+// 👤 USER DETAILS
+// =====================================================
+
+var uid = String(user.telegramid);
+
+var userData = Bot.getProperty("USER_" + uid);
+
+if (!userData || typeof userData !== "object" || Array.isArray(userData)) {
+  userData = {};
+}
+
+
+// =====================================================
+// 🌐 LANGUAGE
+// =====================================================
+
+var language = userData.language || "hinglish";
 
 if (
-  typeof request !== "undefined" &&
-  request &&
-  request.id
+  language !== "hinglish" &&
+  language !== "english" &&
+  language !== "gujarati"
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  language = "hinglish";
 }
 
-// ==========================================
-// 👤 USER DATA
-// ==========================================
 
-let uid = user.telegramid
+// =====================================================
+// 📝 USER ACTIVITY
+// =====================================================
 
-let userData = Bot.getProperty("USER_" + uid)
+var now = new Date().toISOString();
 
-let language =
-  userData && userData.language
-    ? userData.language
-    : "hinglish"
+userData.lastCommand = "ORDER_STARTER";
+userData.lastVisitedAt = now;
+userData.updatedAt = now;
 
-// ==========================================
-// 🔄 STARTER REQUEST MODE
-// ==========================================
+Bot.setProperty("USER_" + uid, userData, "json");
+
+
+// =====================================================
+// 👤 TELEGRAM PROFILE
+// =====================================================
+
+var fullName = String(user.first_name || "");
+
+if (user.last_name) {
+  fullName += " " + String(user.last_name);
+}
+
+fullName = fullName.trim() || "Telegram User";
+
+var telegramUsername = "";
+
+if (user.username) {
+  telegramUsername = "@" + String(user.username);
+}
+
+var premiumStatus = "Not Active";
+
+if (user.is_premium === true) {
+  premiumStatus = "Active";
+}
+
+
+// =====================================================
+// 📦 CREATE STARTER ORDER DRAFT
+// =====================================================
+
+var draft = {
+  id: "",
+  orderId: "",
+
+  userId: uid,
+
+  orderSource: "PACKAGE",
+  source: "PACKAGE",
+
+  packageType: "starter",
+  packageName: "Starter Package",
+  packageStep: "2.2.1.1",
+  packagePrice: "499",
+
+  packageDetails: "",
+
+  advanceAmount: "",
+  remainingAmount: "",
+
+  telegramProfile: {
+    fullName: fullName,
+    telegramId: uid,
+    username: telegramUsername,
+    isPremium: premiumStatus
+  },
+
+  clientInfo: {
+    customName: ""
+  },
+
+  contacts: {
+    telegram: "",
+    otherNumber: "",
+    instagram: "",
+    whatsapp: "",
+    email: ""
+  },
+
+  requirements: "",
+  budget: "",
+  extraDetails: "",
+
+  stage: "contact_menu",
+
+  requestStatus: "draft",
+  orderStatus: "pending_review",
+  paymentStatus: "not_requested",
+  submissionStatus: "draft",
+
+  progress: 0,
+  progressTitle: "Order Started",
+  progressUpdate: "",
+
+  adminId: "",
+  adminNote: "",
+
+  createdAt: now,
+  updatedAt: now,
+
+  acceptedAt: "",
+  advanceRequestedAt: "",
+  advancePaidAt: "",
+  startedAt: "",
+  completedAt: "",
+  remainingRequestedAt: "",
+  remainingPaidAt: "",
+  deliveredAt: "",
+  submittedAt: ""
+};
+
+
+// =====================================================
+// 💾 SAVE ACTIVE PACKAGE DRAFT
+// =====================================================
 
 Bot.setProperty(
-  "STARTER_MODE_" + uid,
-  "waiting",
+  "ORDER_" + uid,
+  draft,
+  "json"
+);
+
+draft.directOrderKey = "DIRECT_ORDER_STARTER_" + uid;
+// =====================================================
+// 🔐 ACTIVE SOURCE
+// =====================================================
+
+Bot.setProperty(
+  "ORDER_ACTIVE_SOURCE_" + uid,
+  "PACKAGE",
   "string"
-)
+);
 
-// ==========================================
-// 📝 REQUEST MESSAGE
-// ==========================================
 
-let text = ""
+// =====================================================
+// 🧹 CLEAR OLD TEMPORARY DATA
+// =====================================================
 
-// ==========================================
-// 🇮🇳 HINGLISH
-// ==========================================
+Bot.setProperty("ORDER_MODE_" + uid, "", "string");
+Bot.setProperty("ORDER_PACKAGE_" + uid, "", "string");
+Bot.setProperty("STARTER_MODE_" + uid, "", "string");
 
-if (language == "hinglish") {
 
-  text =
-    "🚀 <b>STARTER BOT REQUEST</b>\n\n" +
-    "Aap Starter Bot request submit kar rahe ho.\n\n" +
-    "📝 Apni requirements ek message mein bhejo:\n\n" +
-    "• Bot ka naam\n" +
-    "• Bot ka purpose\n" +
-    "• Required features\n" +
-    "• Language\n" +
-    "• Special buttons/design\n\n" +
-    "✍️ Ab apna message type karke bhejo."
+// =====================================================
+// ➡️ NEXT STEP
+// =====================================================
 
-}
-
-// ==========================================
-// 🇬🇧 ENGLISH
-// ==========================================
-
-else if (language == "english") {
-
-  text =
-    "🚀 <b>STARTER BOT REQUEST</b>\n\n" +
-    "You are submitting a Starter Bot request.\n\n" +
-    "📝 Send your requirements in one message:\n\n" +
-    "• Bot name\n" +
-    "• Bot purpose\n" +
-    "• Required features\n" +
-    "• Language\n" +
-    "• Special buttons/design\n\n" +
-    "✍️ Now type and send your requirements."
-
-}
-
-// ==========================================
-// 🇬🇺 GUJARATI
-// ==========================================
-
-else if (language == "gujarati") {
-
-  text =
-    "🚀 <b>STARTER BOT REQUEST</b>\n\n" +
-    "તમે Starter Bot ની request submit કરી રહ્યા છો.\n\n" +
-    "📝 તમારી requirements એક message માં મોકલો:\n\n" +
-    "• Bot નું નામ\n" +
-    "• Bot નો purpose\n" +
-    "• Required features\n" +
-    "• Language\n" +
-    "• Special buttons/design\n\n" +
-    "✍️ હવે તમારી requirements type કરીને મોકલો."
-
-}
-
-// ==========================================
-// 📤 SEND REQUEST MESSAGE
-// ==========================================
-
-Api.sendMessage({
-  chat_id: uid,
-  text: text,
-  parse_mode: "HTML"
-})
-
-// ==========================================
-// ➡️ NEXT COMMAND
-// ==========================================
-
-Bot.runCommand("STARTER_REQUEST_TEXT")
+Bot.runCommand("ORDER_CONTACT_MENU");

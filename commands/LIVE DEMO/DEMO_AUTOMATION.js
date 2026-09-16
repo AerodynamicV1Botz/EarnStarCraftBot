@@ -16,6 +16,12 @@
   group: 
 CMD*/
 
+/*CMD
+  command: DEMO_AUTOMATION
+  need_reply: false
+  folder: DEMOS
+*/
+
 // ==========================================
 // 🤖 EARNSTAR BOTCRAFT
 // SCRIPT 181 — UPDATED VERSION
@@ -23,12 +29,23 @@ CMD*/
 // STEP 5.6 — BUSINESS AUTOMATION DEMO
 // 📁 Live Demos → Automation
 // 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
+// ✅ One-Page Demo
 // ✅ Same Message Edit + Delete Fallback
 // ==========================================
 
-var uid = user.telegramid
-var userData = Bot.getProperty("USER_" + uid) || {}
-var lang = userData.language || "hinglish"
+
+// ==========================================
+// 👤 USER DATA
+// ==========================================
+
+var uid = String(user.telegramid)
+
+var userData =
+  Bot.getProperty("USER_" + uid) || {}
+
+var lang =
+  userData.language || "hinglish"
+
 
 // ==========================================
 // 🔔 CALLBACK ANSWER
@@ -44,6 +61,7 @@ if (
   })
 }
 
+
 // ==========================================
 // 📝 LANGUAGE TEXT
 // ==========================================
@@ -51,10 +69,13 @@ if (
 var text = ""
 
 if (lang == "english") {
+
   text =
     "⚙️ <b>BUSINESS AUTOMATION BOT DEMO</b>\n\n" +
+
     "🤖 A smart Telegram workflow designed to automate repetitive business tasks and save time.\n\n" +
-    "✨ <b>Demo Features:</b>\n" +
+
+    "✨ <b>Demo Features</b>\n" +
     "• ⚡ Automated responses\n" +
     "• 📝 Automated forms\n" +
     "• 👤 User data collection\n" +
@@ -63,15 +84,26 @@ if (lang == "english") {
     "• 🔄 Multi-step workflows\n" +
     "• 🛡️ Admin controls\n" +
     "• 📊 Basic activity tracking\n\n" +
-    "💡 <b>Best for:</b>\n" +
-    "Businesses • Agencies • Creators • Communities\n\n" +
-    "🚀 Automate repetitive tasks and keep your workflow organized.\n\n" +
-    "🎯 This is a showcase demo. The automation can be customized according to your requirements."
+
+    "🔄 <b>Example Workflow</b>\n" +
+    "User starts the bot → selects an option → submits information → system processes the request → user and admin receive updates.\n\n" +
+
+    "💡 <b>Best For</b>\n" +
+    "Businesses • Agencies • Creators • Communities • Service Providers\n\n" +
+
+    "🚀 <b>Business Benefit</b>\n" +
+    "Automate repetitive tasks, reduce manual work and keep your business workflow organized.\n\n" +
+
+    "🎯 This is a showcase demo. The automation, forms, notifications and workflows can be customized according to your requirements."
+
 } else if (lang == "gujarati") {
+
   text =
     "⚙️ <b>BUSINESS AUTOMATION BOT DEMO</b>\n\n" +
+
     "🤖 Repetitive business tasks automate કરવા અને સમય બચાવવા માટે smart Telegram workflow.\n\n" +
-    "✨ <b>Demo Features:</b>\n" +
+
+    "✨ <b>ડેમો ફીચર્સ</b>\n" +
     "• ⚡ Automated responses\n" +
     "• 📝 Automated forms\n" +
     "• 👤 User data collection\n" +
@@ -80,15 +112,26 @@ if (lang == "english") {
     "• 🔄 Multi-step workflows\n" +
     "• 🛡️ Admin controls\n" +
     "• 📊 Basic activity tracking\n\n" +
-    "💡 <b>Best for:</b>\n" +
-    "Businesses • Agencies • Creators • Communities\n\n" +
-    "🚀 Repetitive tasks automate કરીને workflow organized રાખો.\n\n" +
-    "🎯 આ showcase demo છે. Requirements પ્રમાણે automation customize કરી શકાય છે."
+
+    "🔄 <b>Example Workflow</b>\n" +
+    "User bot શરૂ કરે → option પસંદ કરે → information submit કરે → system request process કરે → user અને admin ને updates મળે.\n\n" +
+
+    "💡 <b>કયા માટે ઉપયોગી</b>\n" +
+    "Businesses • Agencies • Creators • Communities • Service Providers\n\n" +
+
+    "🚀 <b>Business Benefit</b>\n" +
+    "Repetitive tasks automate કરવા, manual work ઘટાડવા અને business workflow organized રાખવામાં મદદ કરે છે.\n\n" +
+
+    "🎯 આ showcase demo છે. Automation, forms, notifications અને workflows તમારી requirements પ્રમાણે customize કરી શકાય છે."
+
 } else {
+
   text =
     "⚙️ <b>BUSINESS AUTOMATION BOT DEMO</b>\n\n" +
+
     "🤖 Repetitive business tasks automate karne aur time save karne ke liye smart Telegram workflow.\n\n" +
-    "✨ <b>Demo Features:</b>\n" +
+
+    "✨ <b>Demo Features</b>\n" +
     "• ⚡ Automated responses\n" +
     "• 📝 Automated forms\n" +
     "• 👤 User data collection\n" +
@@ -97,82 +140,40 @@ if (lang == "english") {
     "• 🔄 Multi-step workflows\n" +
     "• 🛡️ Admin controls\n" +
     "• 📊 Basic activity tracking\n\n" +
-    "💡 <b>Best for:</b>\n" +
-    "Businesses • Agencies • Creators • Communities\n\n" +
-    "🚀 Repetitive tasks automate karo aur apna workflow organized rakho.\n\n" +
-    "🎯 Ye showcase demo hai. Automation requirements ke according customize ki ja sakti hai."
+
+    "🔄 <b>Example Workflow</b>\n" +
+    "User bot start karta hai → option select karta hai → information submit karta hai → system request process karta hai → user aur admin ko updates milte hain.\n\n" +
+
+    "💡 <b>Best For</b>\n" +
+    "Businesses • Agencies • Creators • Communities • Service Providers\n\n" +
+
+    "🚀 <b>Business Benefit</b>\n" +
+    "Repetitive tasks automate karo, manual work kam karo aur apna business workflow organized rakho.\n\n" +
+
+    "🎯 Ye showcase demo hai. Automation, forms, notifications aur workflows aapki requirements ke according customize kiye ja sakte hain."
 }
+
 
 // ==========================================
 // 🔘 BUTTON TEXT
 // ==========================================
 
-var autoReply = "⚡ Auto Reply Demo"
-var autoForm = "📝 Form Demo"
-var autoNotification = "🔔 Notification Demo"
-var autoWorkflow = "🔄 Workflow Demo"
-var autoAdmin = "🛡️ Admin Controls"
-var buildBot = "🚀 Build Similar Bot"
 var allDemos = "🎬 All Demos"
 var mainMenu = "🏠 Main Menu"
 
-if (lang == "english") {
-  autoReply = "⚡ Auto Reply Demo"
-  autoForm = "📝 Form Demo"
-  autoNotification = "🔔 Notification Demo"
-  autoWorkflow = "🔄 Workflow Demo"
-  autoAdmin = "🛡️ Admin Controls"
-  buildBot = "🚀 Build Similar Bot"
-  allDemos = "🎬 All Demos"
-  mainMenu = "🏠 Main Menu"
-} else if (lang == "gujarati") {
-  autoReply = "⚡ ઓટો રિપ્લાય ડેમો"
-  autoForm = "📝 ફોર્મ ડેમો"
-  autoNotification = "🔔 નોટિફિકેશન ડેમો"
-  autoWorkflow = "🔄 વર્કફ્લો ડેમો"
-  autoAdmin = "🛡️ એડમિન કંટ્રોલ્સ"
-  buildBot = "🚀 આવો બોટ બનાવો"
+if (lang == "gujarati") {
   allDemos = "🎬 બધા ડેમો"
   mainMenu = "🏠 મુખ્ય મેનુ"
 }
 
+
 // ==========================================
 // 🔘 INLINE BUTTONS
 // ==========================================
+// Inner feature buttons removed.
+// All automation details are shown on one page.
 
 var buttons = [
-  [
-    {
-      text: autoReply,
-      callback_data: "AUTO_REPLY"
-    },
-    {
-      text: autoForm,
-      callback_data: "AUTO_FORM"
-    }
-  ],
-  [
-    {
-      text: autoNotification,
-      callback_data: "AUTO_NOTIFICATION"
-    },
-    {
-      text: autoWorkflow,
-      callback_data: "AUTO_WORKFLOW"
-    }
-  ],
-  [
-    {
-      text: autoAdmin,
-      callback_data: "AUTO_ADMIN"
-    }
-  ],
-  [
-    {
-      text: buildBot,
-      callback_data: "ORDER_CUSTOM"
-    }
-  ],
   [
     {
       text: allDemos,
@@ -185,17 +186,22 @@ var buttons = [
   ]
 ]
 
+
 // ==========================================
 // ✏️ SAME MESSAGE EDIT + DELETE FALLBACK
 // ==========================================
 
 function showAutomationMenu(messageText, inlineButtons) {
+
   if (
     typeof request !== "undefined" &&
+    request &&
     request.message &&
     request.message.message_id
   ) {
+
     try {
+
       Api.editMessageText({
         chat_id: uid,
         message_id: request.message.message_id,
@@ -207,15 +213,21 @@ function showAutomationMenu(messageText, inlineButtons) {
       })
 
       return
+
     } catch (error) {
+
       try {
+
         Api.deleteMessage({
           chat_id: uid,
           message_id: request.message.message_id
         })
+
       } catch (deleteError) {}
+
     }
   }
+
 
   Api.sendMessage({
     chat_id: uid,
@@ -226,6 +238,7 @@ function showAutomationMenu(messageText, inlineButtons) {
     }
   })
 }
+
 
 // ==========================================
 // 🚀 SHOW AUTOMATION DEMO

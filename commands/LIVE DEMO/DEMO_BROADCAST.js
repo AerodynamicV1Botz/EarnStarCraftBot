@@ -16,161 +16,291 @@
   group: 
 CMD*/
 
+/*CMD
+  command: DEMO_BROADCAST
+  need_reply: false
+  folder: MAIN_MENU
+*/
+
 // ==========================================
 // 🤖 EARNSTAR BOTCRAFT
 // SCRIPT 122 — UPDATED VERSION
 // COMMAND NAME: DEMO_BROADCAST
 // STEP 5.3 — BROADCAST & NOTIFICATION DEMO
-// 📁 Live Demos → Broadcast Demo
+// 📁 MAIN MENU → LIVE DEMOS → BROADCAST
 // 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
+// ==========================================
+// ✅ Complete information on one page
+// ✅ Removed Broadcast Demo button
+// ✅ Removed User Management button
+// ✅ Removed Statistics button
+// ✅ Removed Build Similar Bot button
+// ✅ Only All Demos + Main Menu navigation
 // ✅ Same Message Edit + Delete Fallback
 // ==========================================
 
-var uid = user.telegramid
+// ==========================================
+// 👤 USER DATA
+// ==========================================
+
+var uid = String(user.telegramid)
+
 var userData = Bot.getProperty("USER_" + uid) || {}
+
 var lang = userData.language || "hinglish"
 
-// ---------- CALLBACK ANSWER ----------
+// ==========================================
+// ⚡ CALLBACK ANSWER
+// ==========================================
+
 if (
   typeof request !== "undefined" &&
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {}
 }
 
-// ---------- TEXT ----------
-var text = ""
+// ==========================================
+// 🌐 NAVIGATION BUTTON TEXT
+// ==========================================
 
-if (lang == "english") {
-  text =
-    "📢 <b>BROADCAST & NOTIFICATION BOT DEMO</b>\n\n" +
-    "🤖 A business-focused notification system for sending updates and announcements to registered users.\n\n" +
-    "✨ <b>Demo Features:</b>\n" +
-    "• 📢 Broadcast announcements\n" +
-    "• 🔔 User notifications\n" +
-    "• 👥 User list management\n" +
-    "• 📊 Basic delivery statistics\n" +
-    "• 🛡️ Admin-only controls\n" +
-    "• 🚫 Automatic handling of blocked users\n" +
-    "• 📝 Custom message support\n" +
-    "• ⚡ Organized broadcast workflow\n\n" +
-    "💡 <b>Best for:</b>\n" +
-    "Businesses • Communities • Channels • Creators\n\n" +
-    "🎯 This is a showcase demo. The actual system can be customized according to project requirements."
+var allDemosText =
+  lang === "english"
+    ? "🎬 All Demos"
+    : lang === "gujarati"
+    ? "🎬 બધા ડેમો"
+    : "🎬 All Demos"
 
-} else if (lang == "gujarati") {
-  text =
-    "📢 <b>BROADCAST & NOTIFICATION BOT DEMO</b>\n\n" +
-    "🤖 Registered users ને updates અને announcements મોકલવા માટે business-focused notification system.\n\n" +
-    "✨ <b>Demo Features:</b>\n" +
-    "• 📢 Broadcast announcements\n" +
-    "• 🔔 User notifications\n" +
-    "• 👥 User list management\n" +
-    "• 📊 Basic delivery statistics\n" +
-    "• 🛡️ Admin-only controls\n" +
-    "• 🚫 Blocked users નું automatic handling\n" +
-    "• 📝 Custom message support\n" +
-    "• ⚡ Organized broadcast workflow\n\n" +
-    "💡 <b>Best for:</b>\n" +
-    "Businesses • Communities • Channels • Creators\n\n" +
-    "🎯 આ showcase demo છે. Project requirements પ્રમાણે actual system customize કરી શકાય છે."
+var mainMenuText =
+  lang === "english"
+    ? "🏠 Main Menu"
+    : lang === "gujarati"
+    ? "🏠 મુખ્ય મેનુ"
+    : "🏠 Main Menu"
 
-} else {
-  text =
-    "📢 <b>BROADCAST & NOTIFICATION BOT DEMO</b>\n\n" +
-    "🤖 Registered users ko updates aur announcements bhejne ke liye business-focused notification system.\n\n" +
-    "✨ <b>Demo Features:</b>\n" +
-    "• 📢 Broadcast announcements\n" +
-    "• 🔔 User notifications\n" +
-    "• 👥 User list management\n" +
-    "• 📊 Basic delivery statistics\n" +
-    "• 🛡️ Admin-only controls\n" +
-    "• 🚫 Blocked users ka automatic handling\n" +
-    "• 📝 Custom message support\n" +
-    "• ⚡ Organized broadcast workflow\n\n" +
-    "💡 <b>Best for:</b>\n" +
-    "Businesses • Communities • Channels • Creators\n\n" +
-    "🎯 Ye showcase demo hai. Actual system project requirements ke according customize kiya ja sakta hai."
-}
+// ==========================================
+// 🎛️ ONLY NAVIGATION BUTTONS
+// ==========================================
 
-// ---------- BUTTONS ----------
 var buttons = [
   [
     {
-      text: "📢 Broadcast Demo",
-      callback_data: "BROADCAST_TEST"
-    }
-  ],
-  [
-    {
-      text: "👥 User Management",
-      callback_data: "BROADCAST_USERS"
-    },
-    {
-      text: "📊 Statistics",
-      callback_data: "BROADCAST_STATSS"
-    }
-  ],
-  [
-    {
-      text: "🚀 Build Similar Bot",
-      callback_data: "ORDER_CUSTOM"
-    }
-  ],
-  [
-    {
-      text: "🎬 All Demos",
+      text: allDemosText,
       callback_data: "MENU_DEMO"
     },
     {
-      text: "🏠 Main Menu",
+      text: mainMenuText,
       callback_data: "BACK_MAIN_MENU"
     }
   ]
 ]
 
-// ---------- SAME MESSAGE EDIT ----------
-function showBroadcastDemo(text, buttons) {
+// ==========================================
+// 📝 TEXT
+// ==========================================
+
+var text = ""
+
+// ==========================================
+// 🇬🇧 ENGLISH
+// ==========================================
+
+if (lang === "english") {
+
+  text =
+    "📢 <b>BROADCAST &amp; NOTIFICATION BOT DEMO</b>\n\n" +
+
+    "🤖 A business-focused notification system for sending updates and announcements to registered users.\n\n" +
+
+    "✨ <b>System Features</b>\n" +
+    "• 📢 Broadcast announcements to registered users.\n" +
+    "• 🔔 Send individual user notifications.\n" +
+    "• 👥 Maintain and manage a registered user list.\n" +
+    "• 📊 Track basic delivery statistics.\n" +
+    "• 🛡️ Keep broadcast controls restricted to admins.\n" +
+    "• 🚫 Handle blocked or unavailable users automatically.\n" +
+    "• 📝 Support custom messages and announcements.\n" +
+    "• ⚡ Maintain an organized broadcast workflow.\n\n" +
+
+    "💡 <b>Best For</b>\n" +
+    "Businesses, communities, channels, creators and service providers.\n\n" +
+
+    "🚀 <b>Custom Version</b>\n" +
+    "The complete system can be customized according to your project requirements.\n\n" +
+
+    "━━━━━━━━━━━━━━━━━━\n\n" +
+
+    "👇 <b>Explore more demo categories below:</b>"
+
+}
+
+// ==========================================
+// 🇬🇺 GUJARATI
+// ==========================================
+
+else if (lang === "gujarati") {
+
+  text =
+    "📢 <b>BROADCAST &amp; NOTIFICATION BOT DEMO</b>\n\n" +
+
+    "🤖 Registered users ને updates અને announcements મોકલવા માટે business-focused notification system.\n\n" +
+
+    "✨ <b>System Features</b>\n" +
+    "• 📢 Registered users ને broadcast announcements મોકલી શકાય છે.\n" +
+    "• 🔔 Individual user notifications મોકલી શકાય છે.\n" +
+    "• 👥 Registered users ની list manage કરી શકાય છે.\n" +
+    "• 📊 Basic delivery statistics track કરી શકાય છે.\n" +
+    "• 🛡️ Broadcast controls ફક્ત admins માટે રાખી શકાય છે.\n" +
+    "• 🚫 Blocked અથવા unavailable users નું automatic handling કરી શકાય છે.\n" +
+    "• 📝 Custom messages અને announcements support કરી શકાય છે.\n" +
+    "• ⚡ Organized broadcast workflow રાખી શકાય છે.\n\n" +
+
+    "💡 <b>Best For</b>\n" +
+    "Businesses, communities, channels, creators અને service providers માટે ઉપયોગી.\n\n" +
+
+    "🚀 <b>Custom Version</b>\n" +
+    "Project requirements પ્રમાણે complete system customize કરી શકાય છે.\n\n" +
+
+    "━━━━━━━━━━━━━━━━━━\n\n" +
+
+    "👇 <b>નીચે વધુ demo categories explore કરો:</b>"
+
+}
+
+// ==========================================
+// 🇮🇳 HINGLISH
+// ==========================================
+
+else {
+
+  text =
+    "📢 <b>BROADCAST &amp; NOTIFICATION BOT DEMO</b>\n\n" +
+
+    "🤖 Registered users ko updates aur announcements bhejne ke liye business-focused notification system.\n\n" +
+
+    "✨ <b>System Features</b>\n" +
+    "• 📢 Registered users ko broadcast announcements bheje ja sakte hain.\n" +
+    "• 🔔 Individual users ko notifications bheji ja sakti hain.\n" +
+    "• 👥 Registered users ki list manage ki ja sakti hai.\n" +
+    "• 📊 Basic delivery statistics track ki ja sakti hain.\n" +
+    "• 🛡️ Broadcast controls sirf admins ke liye rakhe ja sakte hain.\n" +
+    "• 🚫 Blocked ya unavailable users ka automatic handling ho sakta hai.\n" +
+    "• 📝 Custom messages aur announcements support kiye ja sakte hain.\n" +
+    "• ⚡ Organized broadcast workflow maintain kiya ja sakta hai.\n\n" +
+
+    "💡 <b>Best For</b>\n" +
+    "Businesses, communities, channels, creators aur service providers ke liye useful.\n\n" +
+
+    "🚀 <b>Custom Version</b>\n" +
+    "Complete system ko aapke project requirements ke according customize kiya ja sakta hai.\n\n" +
+
+    "━━━━━━━━━━━━━━━━━━\n\n" +
+
+    "👇 <b>Neeche aur demo categories explore karein:</b>"
+
+}
+
+// ==========================================
+// 🔧 SHOW BROADCAST DEMO
+// ==========================================
+
+function showBroadcastDemo() {
+
+  var messageId = ""
+
   if (
     typeof request !== "undefined" &&
-    request.message &&
-    request.message.message_id
+    request &&
+    request.message
   ) {
+
+    if (request.message.message_id) {
+
+      messageId = String(request.message.message_id)
+
+    } else if (request.message.messageId) {
+
+      messageId = String(request.message.messageId)
+
+    }
+  }
+
+  // ========================================
+  // ✏️ TRY EDIT CURRENT MESSAGE
+  // ========================================
+
+  if (messageId) {
+
     try {
+
       Api.editMessageText({
+
         chat_id: uid,
-        message_id: request.message.message_id,
+
+        message_id: messageId,
+
         text: text,
+
         parse_mode: "HTML",
+
         reply_markup: {
           inline_keyboard: buttons
         }
+
       })
 
       return
 
     } catch (error) {
-      try {
-        Api.deleteMessage({
-          chat_id: uid,
-          message_id: request.message.message_id
-        })
-      } catch (deleteError) {}
+
+      // Edit fail hone par delete fallback
     }
+
+    // ======================================
+    // 🗑️ DELETE OLD MESSAGE
+    // ======================================
+
+    try {
+
+      Api.deleteMessage({
+
+        chat_id: uid,
+
+        message_id: messageId
+
+      })
+
+    } catch (deleteError) {}
+
   }
 
+  // ========================================
+  // 📩 SEND NEW MESSAGE
+  // ========================================
+
   Api.sendMessage({
+
     chat_id: uid,
+
     text: text,
+
     parse_mode: "HTML",
+
     reply_markup: {
       inline_keyboard: buttons
     }
+
   })
+
 }
 
-// ---------- SHOW DEMO ----------
-showBroadcastDemo(text, buttons)
+// ==========================================
+// ▶️ RUN
+// ==========================================
+
+showBroadcastDemo()

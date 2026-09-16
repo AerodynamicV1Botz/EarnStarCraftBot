@@ -16,53 +16,137 @@
   group: 
 CMD*/
 
-// ==========================================
+/*CMD
+  command: SERVICE_BROADCAST
+  need_reply: false
+  folder: SERVICES
+*/
+
+// =====================================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 11 — UPDATED VERSION
-// COMMAND NAME: SERVICE_BROADCAST
-// STEP 3.5 — BROADCAST & NOTIFICATION SYSTEM
-// 📁 MAIN MENU → 📁 SERVICES
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ✅ Same Message Edit + Delete Fallback
-// ==========================================
+// SCRIPT 11 — SERVICE_BROADCAST
+// STEP 2.1.5 — BROADCAST & NOTIFICATION SYSTEM
+// PURPOSE: Show Broadcast & Notification service details
+// CONNECTIONS: MENU_SERVICES → SERVICE_BROADCAST
+// NEXT: MENU_DEMO / MENU_BUILD / MENU_PRICING / MENU_SERVICES
+// =====================================================
 
 
-// ==========================================
+// =====================================================
 // ⚡ INSTANT CALLBACK RESPONSE
-// ==========================================
+// =====================================================
 
-if (typeof request !== "undefined" && request && request.id) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.id
+) {
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback response errors
+  }
 }
 
 
-// ==========================================
+// =====================================================
 // 👤 USER DATA
-// ==========================================
+// =====================================================
 
-let userId = user.telegramid
-let userData = Bot.getProperty("USER_" + userId)
+var userId = String(user.telegramid)
 
-let language = userData && userData.language
-  ? userData.language
-  : "hinglish"
+var userData = Bot.getProperty("USER_" + userId)
 
-let text = ""
-let buttons = []
+if (
+  !userData ||
+  typeof userData !== "object"
+) {
+  userData = {}
+}
 
 
-// ==========================================
+// =====================================================
+// 🌐 LANGUAGE
+// =====================================================
+
+var language = userData.language
+
+if (
+  language !== "hinglish" &&
+  language !== "english" &&
+  language !== "gujarati"
+) {
+  language = "hinglish"
+}
+
+
+// =====================================================
+// 📝 USER ACTIVITY UPDATE
+// =====================================================
+
+userData.lastCommand = "SERVICE_BROADCAST"
+userData.lastVisitedAt = new Date().toISOString()
+
+Bot.setProperty(
+  "USER_" + userId,
+  userData,
+  "json"
+)
+
+
+// =====================================================
+// 💬 CHAT ID
+// =====================================================
+
+var chatId = userId
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message &&
+  request.message.chat &&
+  request.message.chat.id
+) {
+  chatId = request.message.chat.id
+}
+
+
+// =====================================================
+// 🆔 MESSAGE ID
+// =====================================================
+
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message &&
+  request.message.message_id
+) {
+  messageId = request.message.message_id
+}
+
+
+// =====================================================
+// 📝 TEXT + BUTTONS
+// =====================================================
+
+var text = ""
+var buttons = []
+
+
+// =====================================================
 // 🇮🇳 HINGLISH
-// ==========================================
+// =====================================================
 
-if (language == "hinglish") {
+if (language === "hinglish") {
 
   text =
     "📢 <b>Broadcast & Notification System</b>\n\n" +
     "Apne users, customers ya community members ko " +
-    "important updates efficiently send karo.\n\n" +
+    "important updates efficiently aur organized way mein send karo.\n\n" +
     "✨ <b>Features:</b>\n" +
     "• 📢 Bulk Announcements\n" +
     "• 🔔 Automatic Notifications\n" +
@@ -109,15 +193,15 @@ if (language == "hinglish") {
 }
 
 
-// ==========================================
+// =====================================================
 // 🇬🇧 ENGLISH
-// ==========================================
+// =====================================================
 
-else if (language == "english") {
+else if (language === "english") {
 
   text =
     "📢 <b>Broadcast & Notification System</b>\n\n" +
-    "Send important updates to your users, customers or community " +
+    "Send important updates to your users, customers, or community " +
     "members efficiently and in an organized way.\n\n" +
     "✨ <b>Features:</b>\n" +
     "• 📢 Bulk Announcements\n" +
@@ -165,11 +249,11 @@ else if (language == "english") {
 }
 
 
-// ==========================================
+// =====================================================
 // 🇬🇺 GUJARATI
-// ==========================================
+// =====================================================
 
-else if (language == "gujarati") {
+else if (language === "gujarati") {
 
   text =
     "📢 <b>Broadcast & Notification System</b>\n\n" +
@@ -221,32 +305,16 @@ else if (language == "gujarati") {
 }
 
 
-// ==========================================
-// ✏️ MESSAGE ID
-// ==========================================
-
-let messageId = null
-
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
-}
-
-
-// ==========================================
+// =====================================================
 // 🔄 SAME MESSAGE EDIT SYSTEM
-// ==========================================
+// =====================================================
 
 if (messageId) {
 
   try {
 
     Api.editMessageText({
-      chat_id: userId,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -257,26 +325,19 @@ if (messageId) {
 
   } catch (error) {
 
-    // ======================================
-    // 🧹 DELETE OLD MESSAGE
-    // ======================================
-
     try {
 
       Api.deleteMessage({
-        chat_id: userId,
+        chat_id: chatId,
         message_id: messageId
       })
 
     } catch (deleteError) {
-      // Old message already deleted ho toh ignore
+      // Ignore delete errors
     }
 
-    // ======================================
-    // 📩 SEND NEW MESSAGE
-    // ======================================
-
     Api.sendMessage({
+      chat_id: chatId,
       text: text,
       parse_mode: "HTML",
       reply_markup: {
@@ -289,13 +350,14 @@ if (messageId) {
 }
 
 
-// ==========================================
+// =====================================================
 // 📩 DIRECT COMMAND MESSAGE
-// ==========================================
+// =====================================================
 
 else {
 
   Api.sendMessage({
+    chat_id: chatId,
     text: text,
     parse_mode: "HTML",
     reply_markup: {

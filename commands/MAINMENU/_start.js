@@ -16,69 +16,69 @@
   group: 
 CMD*/
 
-// ==========================================
+/*CMD
+  command: /start
+  need_reply: false
+  folder: START
+*/
+
+// =====================================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 1 — UPDATED VERSION
-// COMMAND: /start
+// SCRIPT 1 — /start
 // STEP 1
-// 🌐 LANGUAGE SUPPORT INCLUDED
-// ==========================================
+// =====================================================
 // FEATURES:
-// ✅ Full Name
-// ✅ Clickable Mention
-// ✅ Username
-// ✅ User ID
-// ✅ Original Joined Date & Time
-// ✅ Language Preservation
-// ✅ Safe User Data Saving
-// ✅ Duplicate New-User Notification Protection
-// ✅ Owner + Multi-Admin Notification
-// ✅ Group Notification
-// ✅ View User Profile Button
-// ✅ Direct Open User Chat Button
-// ✅ Separate Staff Data Storage
-// ==========================================
+// ✅ User profile creation/update
+// ✅ Clickable user mention
+// ✅ Username and User ID
+// ✅ Original joined date/time preservation
+// ✅ Language preservation
+// ✅ Safe JSON user data storage
+// ✅ BroadcastUsers registration
+// ✅ Owner + multi-admin notification
+// ✅ Duplicate new-user notification protection
+// ✅ Group notification
+// ✅ View User Profile button
+// ✅ Direct Open User Chat button
+// ✅ EARNSTAR_ADMINS support
+// =====================================================
 
 
-// ==========================================
+// =====================================================
 // ⚙️ CONFIGURATION
-// ==========================================
+// =====================================================
 
-// 👑 OWNER ADMIN
 var OWNER_ID = "7897324623"
 
-// 👨‍💼 STAFF ADMINS
-// Abhi empty hai.
-// Staff add karne ke baad IDs yaha automatically save hongi.
+// Fixed project-wide admin property
+var ADMIN_PROPERTY = "EARNSTAR_ADMINS"
 
-var STAFF_PROPERTY = "STAFF_ADMINS"
-
-// 📢 GROUP CHAT ID
-// Actual group ID yaha lagao.
-// Example: "-1001234567890"
-
+// Optional notification group
+// Actual group ID yaha lagao
 var GROUP_ID = "GROUP_ID_HERE"
 
+// Welcome image
+var WELCOME_IMAGE =
+  "https://image.zaw-myo.workers.dev/image/547d5dd3-ffc4-4d98-af82-644b6d8ef419"
 
-// ==========================================
+
+// =====================================================
 // 🛡️ SAFE HTML ESCAPE
-// ==========================================
+// =====================================================
 
 function escapeHTML(value) {
-
   return String(value || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;")
-
 }
 
 
-// ==========================================
+// =====================================================
 // 🕒 IST DATE & TIME
-// ==========================================
+// =====================================================
 
 function getISTDateTime() {
 
@@ -108,45 +108,77 @@ function getISTDateTime() {
 }
 
 
-// ==========================================
+// =====================================================
 // 👥 GET SAFE ADMIN LIST
-// ==========================================
+// Supports:
+// ["123", "456"]
+// [{id:"123"}]
+// [{telegramId:"123"}]
+// =====================================================
 
 function getAdminList() {
 
-  var savedStaff = Bot.getProperty(STAFF_PROPERTY)
+  var savedAdmins = Bot.getProperty(ADMIN_PROPERTY)
 
-  var staffList = []
+  var adminList = []
 
-  if (Array.isArray(savedStaff)) {
-    staffList = savedStaff
+  if (Array.isArray(savedAdmins)) {
+    adminList = savedAdmins
   }
 
-  // Convert IDs to strings.
-  staffList = staffList.map(function(id) {
-    return String(id)
-  })
+  var cleanAdmins = []
 
-  // Remove duplicate IDs.
-  staffList = staffList.filter(function(id, index) {
-    return staffList.indexOf(id) === index
-  })
+  for (var i = 0; i < adminList.length; i++) {
 
-  // Owner must always remain included.
-  if (!staffList.includes(String(OWNER_ID))) {
-    staffList.unshift(String(OWNER_ID))
+    var admin = adminList[i]
+    var adminId = ""
+
+    if (typeof admin === "object" && admin !== null) {
+
+      if (admin.id) {
+        adminId = String(admin.id)
+      }
+
+      else if (admin.telegramId) {
+        adminId = String(admin.telegramId)
+      }
+
+    }
+
+    else {
+      adminId = String(admin)
+    }
+
+    if (
+      adminId &&
+      adminId !== "undefined" &&
+      adminId !== "null" &&
+      adminId !== "[object Object]"
+    ) {
+
+      if (!cleanAdmins.includes(adminId)) {
+        cleanAdmins.push(adminId)
+      }
+
+    }
+
   }
 
-  return staffList
+  // Owner always included
+  if (!cleanAdmins.includes(String(OWNER_ID))) {
+    cleanAdmins.unshift(String(OWNER_ID))
+  }
+
+  return cleanAdmins
 
 }
 
 var ADMIN_IDS = getAdminList()
 
 
-// ==========================================
+// =====================================================
 // 👤 USER INFORMATION
-// ==========================================
+// =====================================================
 
 var userId = String(user.telegramid)
 
@@ -170,22 +202,21 @@ var mention =
 var userKey = "USER_" + userId
 
 
-// ==========================================
+// =====================================================
 // 💾 GET EXISTING USER DATA
-// ==========================================
+// =====================================================
 
 var userData = Bot.getProperty(userKey)
 
 var isNewUser = false
+var joinedInfo = null
 
-var joinedInfo
 
+// =====================================================
+// 🆕 NEW USER PROFILE
+// =====================================================
 
-// ==========================================
-// 🆕 NEW USER
-// ==========================================
-
-if (!userData) {
+if (!userData || typeof userData !== "object") {
 
   isNewUser = true
 
@@ -196,34 +227,34 @@ if (!userData) {
     name: fullName,
     username: username,
     language: null,
+
     joinedAt: joinedInfo.iso,
     joinedDate: joinedInfo.date,
     joinedTime: joinedInfo.time,
+
     source: "/start"
   }
 
 }
 
 
-// ==========================================
-// 🔄 EXISTING USER
-// ==========================================
+// =====================================================
+// 🔄 EXISTING USER PROFILE
+// =====================================================
 
 else {
 
-  // Current information update.
-  // Original joined date/time change nahi hoga.
-
+  // Original joined date/time preserve rahega
   userData.id = userData.id || userId
   userData.name = fullName
   userData.username = username
 
-  // Language preserve rahegi.
+  // Language preserve rahegi
   if (typeof userData.language === "undefined") {
     userData.language = null
   }
 
-  // Purane users ke liye missing joining information.
+  // Agar purane profile mein joined data missing hai
   if (!userData.joinedAt) {
 
     joinedInfo = getISTDateTime()
@@ -241,9 +272,9 @@ else {
 }
 
 
-// ==========================================
-// 💾 SAFE USER DATA SAVE
-// ==========================================
+// =====================================================
+// 💾 SAVE USER PROFILE
+// =====================================================
 
 Bot.setProperty(
   userKey,
@@ -252,9 +283,9 @@ Bot.setProperty(
 )
 
 
-// ==========================================
+// =====================================================
 // 📢 BROADCAST USERS
-// ==========================================
+// =====================================================
 
 var broadcastUsers = Bot.getProperty("BroadcastUsers")
 
@@ -262,34 +293,44 @@ if (!Array.isArray(broadcastUsers)) {
   broadcastUsers = []
 }
 
-// Keep IDs consistent as strings.
-broadcastUsers = broadcastUsers.map(function(id) {
-  return String(id)
-})
+var cleanBroadcastUsers = []
 
-if (!broadcastUsers.includes(userId)) {
+for (var b = 0; b < broadcastUsers.length; b++) {
 
-  broadcastUsers.push(userId)
+  var broadcastId = String(broadcastUsers[b])
 
-  Bot.setProperty(
-    "BroadcastUsers",
-    broadcastUsers,
-    "json"
-  )
+  if (
+    broadcastId &&
+    broadcastId !== "undefined" &&
+    broadcastId !== "null" &&
+    !cleanBroadcastUsers.includes(broadcastId)
+  ) {
+    cleanBroadcastUsers.push(broadcastId)
+  }
 
 }
 
+if (!cleanBroadcastUsers.includes(userId)) {
+  cleanBroadcastUsers.push(userId)
+}
 
-// ==========================================
+Bot.setProperty(
+  "BroadcastUsers",
+  cleanBroadcastUsers,
+  "json"
+)
+
+
+// =====================================================
 // 🌐 SAVED LANGUAGE
-// ==========================================
+// =====================================================
 
 var savedLanguage = userData.language
 
 
-// ==========================================
-// 🔘 LANGUAGE BUTTONS
-// ==========================================
+// =====================================================
+// 🔘 LANGUAGE / MAIN MENU BUTTONS
+// =====================================================
 
 var buttons = []
 
@@ -330,9 +371,9 @@ else {
 }
 
 
-// ==========================================
+// =====================================================
 // 📝 WELCOME TEXT
-// ==========================================
+// =====================================================
 
 var botName = "EarnStar 🤖 BOTCRAFT"
 
@@ -340,14 +381,18 @@ var text =
   "👋 <b>Welcome to " +
   botName +
   "!</b>\n\n" +
+
   "🚀 <b>Professional Telegram Bots & Automation</b>\n\n" +
+
   "🤖 Custom Telegram Bots\n" +
   "⚡ Business Automation\n" +
   "📊 Admin & Management Systems\n" +
   "💬 Customer Support Bots\n" +
   "📢 Broadcast & Notification Systems\n" +
   "🎯 Custom Bot Solutions\n\n" +
+
   "━━━━━━━━━━━━━━━━━━\n\n" +
+
   "💡 <b>Turn your idea into a powerful Telegram bot.</b>\n\n"
 
 if (savedLanguage) {
@@ -369,40 +414,52 @@ else {
 }
 
 
-// ==========================================
+// =====================================================
 // 🆕 NEW USER NOTIFICATION
-// ==========================================
+// =====================================================
 
 if (isNewUser) {
 
-  var joinedDate = userData.joinedDate || "Not available"
-  var joinedTime = userData.joinedTime || "Not available"
+  var joinedDate =
+    userData.joinedDate || "Not available"
+
+  var joinedTime =
+    userData.joinedTime || "Not available"
 
   var adminText =
     "🆕 <b>NEW USER JOINED</b>\n\n" +
+
     "👤 <b>Full Name:</b> " +
     escapeHTML(fullName) +
     "\n" +
+
     "🔵 <b>Mention:</b> " +
     mention +
     "\n" +
+
     "🔗 <b>Username:</b> " +
     escapeHTML(username) +
     "\n" +
+
     "🆔 <b>User ID:</b> <code>" +
     escapeHTML(userId) +
     "</code>\n" +
+
     "🌐 <b>Language:</b> " +
     escapeHTML(userData.language || "Not selected") +
     "\n" +
+
     "📅 <b>Joined Date:</b> " +
     escapeHTML(joinedDate) +
     "\n" +
+
     "🕒 <b>Joined Time:</b> " +
     escapeHTML(joinedTime) +
     " IST\n" +
+
     "📍 <b>Source:</b> " +
     escapeHTML(userData.source || "/start")
+
 
   var notificationButtons = {
     inline_keyboard: [
@@ -422,50 +479,71 @@ if (isNewUser) {
   }
 
 
-  // ========================================
-  // 📢 SEND TO OWNER + ALL STAFF
-  // ========================================
+  // ===================================================
+  // 📢 SEND TO OWNER + AUTHORIZED ADMINS
+  // ===================================================
 
-  for (var i = 0; i < ADMIN_IDS.length; i++) {
+  for (var a = 0; a < ADMIN_IDS.length; a++) {
 
-    Api.sendMessage({
-      chat_id: ADMIN_IDS[i],
-      text: adminText,
-      parse_mode: "HTML",
-      reply_markup: notificationButtons
-    })
+    try {
+
+      Api.sendMessage({
+        chat_id: ADMIN_IDS[a],
+        text: adminText,
+        parse_mode: "HTML",
+        reply_markup: notificationButtons
+      })
+
+    }
+
+    catch (error) {
+
+      // Invalid or blocked admin ko ignore karega
+      // Main /start flow continue rahega
+
+    }
 
   }
 
 
-  // ========================================
+  // ===================================================
   // 📢 GROUP NOTIFICATION
-  // ========================================
+  // ===================================================
 
   if (
     GROUP_ID &&
     GROUP_ID !== "GROUP_ID_HERE"
   ) {
 
-    Api.sendMessage({
-      chat_id: GROUP_ID,
-      text: adminText,
-      parse_mode: "HTML",
-      reply_markup: notificationButtons
-    })
+    try {
+
+      Api.sendMessage({
+        chat_id: GROUP_ID,
+        text: adminText,
+        parse_mode: "HTML",
+        reply_markup: notificationButtons
+      })
+
+    }
+
+    catch (error) {
+
+      // Group notification fail hone par user flow nahi rukega
+
+    }
 
   }
 
 }
 
 
-// ==========================================
+// =====================================================
 // 📸 SEND WELCOME MESSAGE
-// ==========================================
+// =====================================================
 
 Api.sendPhoto({
-  photo:
-    "https://image.zaw-myo.workers.dev/image/547d5dd3-ffc4-4d98-af82-644b6d8ef419",
+
+  photo: WELCOME_IMAGE,
 
   caption: text,
 
@@ -474,4 +552,5 @@ Api.sendPhoto({
   reply_markup: {
     inline_keyboard: buttons
   }
+
 })

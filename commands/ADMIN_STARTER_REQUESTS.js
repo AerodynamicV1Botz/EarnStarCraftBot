@@ -33,31 +33,62 @@ if (
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback response error
+  }
+}
+
+
+// ---------- USER AND CHAT INFO ----------
+var userId = String(user.telegramid)
+
+var chatId = userId
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message
+) {
+  if (
+    request.message.chat &&
+    request.message.chat.id
+  ) {
+    chatId = request.message.chat.id
+  }
+
+  if (request.message.message_id) {
+    messageId = request.message.message_id
+  }
 }
 
 
 // ---------- ADMIN ACCESS ----------
-let userId = user.telegramid
+var ownerId = "7897324623"
 
-let ownerId = "7897324623"
-
-let staffAdmins = Bot.getProperty("STAFF_ADMINS", [])
+var staffAdmins = Bot.getProperty(
+  "STAFF_ADMINS",
+  []
+)
 
 if (!Array.isArray(staffAdmins)) {
   staffAdmins = []
 }
 
-let isAdmin =
+var isAdmin =
   String(userId) === String(ownerId) ||
   staffAdmins.map(String).includes(String(userId))
 
 if (!isAdmin) {
   Api.sendMessage({
-    chat_id: userId,
-    text: "❌ <b>Access Denied</b>\n\nYou are not authorized to access this panel.",
+    chat_id: chatId,
+    text:
+      "❌ <b>Access Denied</b>\n\n" +
+      "You are not authorized to access this panel.",
     parse_mode: "HTML"
   })
 
@@ -66,92 +97,166 @@ if (!isAdmin) {
 
 
 // ---------- LANGUAGE ----------
-let userData = Bot.getProperty("USER_" + userId)
+var userData = Bot.getProperty(
+  "USER_" + userId
+)
 
-let language =
-  userData && userData.language
-    ? userData.language
-    : "hinglish"
+var language = "hinglish"
+
+if (
+  userData &&
+  userData.language
+) {
+  language = userData.language
+}
 
 
 // ---------- LOAD REQUEST IDS ----------
-let requestKeys = Bot.getProperty("STARTER_REQUEST_KEYS", [])
+var requestKeys = Bot.getProperty(
+  "STARTER_REQUEST_KEYS",
+  []
+)
 
 if (!Array.isArray(requestKeys)) {
   requestKeys = []
 }
 
 
+// ---------- REMOVE DUPLICATE REQUEST IDS ----------
+var uniqueKeys = []
+var seenKeys = {}
+
+for (var k = 0; k < requestKeys.length; k++) {
+  var currentKey = String(requestKeys[k])
+
+  if (!seenKeys[currentKey]) {
+    seenKeys[currentKey] = true
+    uniqueKeys.push(currentKey)
+  }
+}
+
+requestKeys = uniqueKeys.slice().reverse()
+
+
 // ---------- STATUS COUNTS ----------
-let pendingCount = 0
-let acceptedCount = 0
-let rejectedCount = 0
-let cancelledCount = 0
-let totalCount = 0
+var pendingCount = 0
+var acceptedCount = 0
+var rejectedCount = 0
+var cancelledCount = 0
+var closedCount = 0
+var totalCount = 0
 
-let requestButtons = []
+var requestButtons = []
+var displayedCount = 0
 
-// Latest requests first
-requestKeys = requestKeys.slice().reverse()
+// ---------- MAX REQUESTS ----------
+var MAX_REQUESTS = 30
 
 
 // ---------- BUILD REQUEST LIST ----------
-for (let i = 0; i < requestKeys.length; i++) {
+for (
+  var i = 0;
+  i < requestKeys.length;
+  i++
+) {
+  var requestId = String(requestKeys[i])
 
-  let requestId = requestKeys[i]
+  if (!requestId) {
+    continue
+  }
 
-  let requestData = Bot.getProperty(
+  var requestData = Bot.getProperty(
     "STARTER_REQUEST_" + requestId
   )
 
-  if (!requestData) {
+  if (
+    !requestData ||
+    typeof requestData !== "object"
+  ) {
     continue
   }
 
   totalCount++
 
-  let status = requestData.status || "pending"
+  var status = String(
+    requestData.status || "pending"
+  ).toLowerCase()
 
   if (status === "pending") {
     pendingCount++
   }
 
-  if (status === "accepted") {
+  else if (status === "accepted") {
     acceptedCount++
   }
 
-  if (status === "rejected") {
+  else if (status === "rejected") {
     rejectedCount++
   }
 
-  if (status === "cancelled") {
+  else if (status === "cancelled") {
     cancelledCount++
   }
 
-  let statusIcon = "🟡"
+  else if (status === "closed") {
+    closedCount++
+  }
+
+
+  // ---------- STATUS ICON ----------
+  var statusIcon = "🟡"
 
   if (status === "accepted") {
     statusIcon = "🟢"
   }
 
-  if (status === "rejected") {
+  else if (status === "rejected") {
     statusIcon = "🔴"
   }
 
-  if (status === "cancelled") {
+  else if (status === "cancelled") {
     statusIcon = "⚫"
   }
 
-  let customerName =
+  else if (status === "closed") {
+    statusIcon = "🔵"
+  }
+
+
+  // ---------- CUSTOMER NAME ----------
+  var customerName =
     requestData.fullName ||
     requestData.username ||
+    requestData.name ||
     "Unknown User"
 
-  let serviceName =
+  customerName = String(customerName)
+    .replace(/\n/g, " ")
+    .trim()
+
+  if (customerName.length > 28) {
+    customerName =
+      customerName.substring(0, 25) + "..."
+  }
+
+
+  // ---------- SERVICE NAME ----------
+  var serviceName =
     requestData.service ||
     "Starter Package"
 
-  let buttonText =
+  serviceName = String(serviceName)
+    .replace(/\n/g, " ")
+    .trim()
+
+  if (serviceName.length > 20) {
+    serviceName =
+      serviceName.substring(0, 17) + "..."
+  }
+
+
+  // ---------- BUTTON TEXT ----------
+  var buttonText =
     statusIcon +
     " " +
     requestId +
@@ -163,12 +268,14 @@ for (let i = 0; i < requestKeys.length; i++) {
   requestButtons.push([
     {
       text: buttonText,
-      callback_data: "STARTER_ADMIN_VIEW " + requestId
+      callback_data:
+        "STARTER_ADMIN_VIEW " + requestId
     }
   ])
 
-  // Show maximum 30 requests in one message
-  if (requestButtons.length >= 30) {
+  displayedCount++
+
+  if (displayedCount >= MAX_REQUESTS) {
     break
   }
 }
@@ -177,7 +284,7 @@ for (let i = 0; i < requestKeys.length; i++) {
 // ---------- EMPTY LIST ----------
 if (totalCount === 0) {
 
-  let emptyText = ""
+  var emptyText = ""
 
   if (language === "english") {
     emptyText =
@@ -211,8 +318,27 @@ if (totalCount === 0) {
     }
   ])
 
+  if (messageId) {
+    try {
+      Api.editMessageText({
+        chat_id: chatId,
+        message_id: messageId,
+        text: emptyText,
+        parse_mode: "HTML",
+        reply_markup: {
+          inline_keyboard: requestButtons
+        }
+      })
+
+      return
+
+    } catch (error) {
+      // Continue with send fallback
+    }
+  }
+
   Api.sendMessage({
-    chat_id: userId,
+    chat_id: chatId,
     text: emptyText,
     parse_mode: "HTML",
     reply_markup: {
@@ -225,7 +351,7 @@ if (totalCount === 0) {
 
 
 // ---------- HEADER TEXT ----------
-let text = ""
+var text = ""
 
 if (language === "english") {
 
@@ -235,7 +361,11 @@ if (language === "english") {
     "🟡 <b>Pending:</b> " + pendingCount + "\n" +
     "🟢 <b>Accepted:</b> " + acceptedCount + "\n" +
     "🔴 <b>Rejected:</b> " + rejectedCount + "\n" +
-    "⚫ <b>Cancelled:</b> " + cancelledCount + "\n\n" +
+    "⚫ <b>Cancelled:</b> " + cancelledCount + "\n" +
+    "🔵 <b>Closed:</b> " + closedCount + "\n\n" +
+    "📌 <b>Showing:</b> " +
+    displayedCount +
+    " latest requests\n\n" +
     "👇 Select a request to view details:"
 }
 
@@ -247,7 +377,11 @@ else if (language === "gujarati") {
     "🟡 <b>પેન્ડિંગ:</b> " + pendingCount + "\n" +
     "🟢 <b>સ્વીકારેલી:</b> " + acceptedCount + "\n" +
     "🔴 <b>નકારેલી:</b> " + rejectedCount + "\n" +
-    "⚫ <b>રદ કરેલી:</b> " + cancelledCount + "\n\n" +
+    "⚫ <b>રદ કરેલી:</b> " + cancelledCount + "\n" +
+    "🔵 <b>બંધ:</b> " + closedCount + "\n\n" +
+    "📌 <b>દેખાડેલી:</b> " +
+    displayedCount +
+    " નવીનતમ requests\n\n" +
     "👇 વિગતો જોવા માટે request પસંદ કરો:"
 }
 
@@ -259,7 +393,11 @@ else {
     "🟡 <b>Pending:</b> " + pendingCount + "\n" +
     "🟢 <b>Accepted:</b> " + acceptedCount + "\n" +
     "🔴 <b>Rejected:</b> " + rejectedCount + "\n" +
-    "⚫ <b>Cancelled:</b> " + cancelledCount + "\n\n" +
+    "⚫ <b>Cancelled:</b> " + cancelledCount + "\n" +
+    "🔵 <b>Closed:</b> " + closedCount + "\n\n" +
+    "📌 <b>Showing:</b> " +
+    displayedCount +
+    " latest requests\n\n" +
     "👇 Details dekhne ke liye request select karo:"
 }
 
@@ -280,26 +418,13 @@ requestButtons.push([
 ])
 
 
-// ---------- MESSAGE ID ----------
-let messageId = null
-
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
-}
-
-
 // ---------- SAME MESSAGE EDIT ----------
 if (messageId) {
 
   try {
 
     Api.editMessageText({
-      chat_id: userId,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -308,39 +433,30 @@ if (messageId) {
       }
     })
 
+    return
+
   } catch (error) {
 
     try {
 
       Api.deleteMessage({
-        chat_id: userId,
+        chat_id: chatId,
         message_id: messageId
       })
 
     } catch (deleteError) {
       // Ignore delete error
     }
-
-    Api.sendMessage({
-      chat_id: userId,
-      text: text,
-      parse_mode: "HTML",
-      reply_markup: {
-        inline_keyboard: requestButtons
-      }
-    })
-
   }
-
-} else {
-
-  Api.sendMessage({
-    chat_id: userId,
-    text: text,
-    parse_mode: "HTML",
-    reply_markup: {
-      inline_keyboard: requestButtons
-    }
-  })
-
 }
+
+
+// ---------- SEND NEW MESSAGE ----------
+Api.sendMessage({
+  chat_id: chatId,
+  text: text,
+  parse_mode: "HTML",
+  reply_markup: {
+    inline_keyboard: requestButtons
+  }
+})

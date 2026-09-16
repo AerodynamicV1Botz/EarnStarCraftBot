@@ -85,7 +85,7 @@ if (language === "english") {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
@@ -129,7 +129,7 @@ else if (language === "gujarati") {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]
@@ -173,7 +173,7 @@ else {
     [
       {
         text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
+        callback_data: "MAIN_MENU"
       }
     ]
   ]

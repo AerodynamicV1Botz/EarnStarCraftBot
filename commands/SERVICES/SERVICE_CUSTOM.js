@@ -16,51 +16,127 @@
   group: 
 CMD*/
 
-// ==========================================
-// 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 12 — UPDATED VERSION
-// COMMAND NAME: SERVICE_CUSTOM
-// STEP 3.6 — CUSTOM SOLUTION
-// 📁 MAIN MENU → 📁 SERVICES
-// 🌐 Language support included
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ==========================================
+/*CMD
+  command: SERVICE_CUSTOM
+  need_reply: false
+  folder: SERVICES
+*/
 
-// ==========================================
+// =====================================================
+// 🤖 EARNSTAR BOTCRAFT
+// SCRIPT 12 — SERVICE_CUSTOM
+// STEP 2.1.6 — CUSTOM SOLUTION
+// PURPOSE: Show custom bot and automation service details
+// CONNECTIONS: MENU_SERVICES → SERVICE_CUSTOM
+// NEXT: MENU_BUILD / MENU_DEMO / MENU_CONTACT / MENU_SERVICES
+// =====================================================
+
+
+// =====================================================
 // ⚡ INSTANT CALLBACK RESPONSE
-// ==========================================
+// =====================================================
 
 if (
   typeof request !== "undefined" &&
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {
+    // Ignore callback response errors
+  }
 }
 
-// ==========================================
-// 👤 USER DATA & LANGUAGE
-// ==========================================
 
-let userId = user.telegramid
+// =====================================================
+// 👤 USER DATA
+// =====================================================
 
-let userData = Bot.getProperty("USER_" + userId)
+var userId = String(user.telegramid)
 
-let language =
-  userData && userData.language
-    ? userData.language
-    : "hinglish"
+var userData = Bot.getProperty("USER_" + userId)
 
-let text = ""
-let buttons = []
+if (
+  !userData ||
+  typeof userData !== "object"
+) {
+  userData = {}
+}
 
-// ==========================================
+
+// =====================================================
+// 🌐 LANGUAGE
+// =====================================================
+
+var language = userData.language
+
+if (
+  language !== "hinglish" &&
+  language !== "english" &&
+  language !== "gujarati"
+) {
+  language = "hinglish"
+}
+
+
+// =====================================================
+// 📝 USER ACTIVITY UPDATE
+// =====================================================
+
+userData.lastCommand = "SERVICE_CUSTOM"
+userData.lastVisitedAt = new Date().toISOString()
+
+Bot.setProperty(
+  "USER_" + userId,
+  userData,
+  "json"
+)
+
+
+// =====================================================
+// 💬 CHAT ID + MESSAGE ID
+// =====================================================
+
+var chatId = userId
+var messageId = null
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message &&
+  request.message.chat &&
+  request.message.chat.id
+) {
+  chatId = request.message.chat.id
+}
+
+if (
+  typeof request !== "undefined" &&
+  request &&
+  request.message &&
+  request.message.message_id
+) {
+  messageId = request.message.message_id
+}
+
+
+// =====================================================
+// 📝 TEXT + BUTTONS
+// =====================================================
+
+var text = ""
+var buttons = []
+
+
+// =====================================================
 // 🇮🇳 HINGLISH
-// ==========================================
+// =====================================================
 
-if (language == "hinglish") {
+if (language === "hinglish") {
+
   text =
     "🎯 <b>Custom Bot Solution</b>\n\n" +
     "Agar aapko ek unique bot ya automation system chahiye " +
@@ -109,16 +185,19 @@ if (language == "hinglish") {
       }
     ]
   ]
+
 }
 
-// ==========================================
-// 🇬🇧 ENGLISH
-// ==========================================
 
-else if (language == "english") {
+// =====================================================
+// 🇬🇧 ENGLISH
+// =====================================================
+
+else if (language === "english") {
+
   text =
     "🎯 <b>Custom Bot Solution</b>\n\n" +
-    "Need a unique bot or automation system that doesn't fit " +
+    "Need a unique bot or automation system that does not fit " +
     "our standard packages? We can design a custom solution based on your requirements.\n\n" +
     "💡 <b>Examples:</b>\n" +
     "• 🏢 Business Management Bot\n" +
@@ -162,13 +241,16 @@ else if (language == "english") {
       }
     ]
   ]
+
 }
 
-// ==========================================
-// 🇬🇺 GUJARATI
-// ==========================================
 
-else if (language == "gujarati") {
+// =====================================================
+// 🇬🇺 GUJARATI
+// =====================================================
+
+else if (language === "gujarati") {
+
   text =
     "🎯 <b>Custom Bot Solution</b>\n\n" +
     "જો તમને એવો Unique Bot અથવા Automation System જોઈએ " +
@@ -216,31 +298,20 @@ else if (language == "gujarati") {
       }
     ]
   ]
+
 }
 
-// ==========================================
-// 📨 MESSAGE ID DETECTION
-// ==========================================
 
-let messageId = null
-
-if (
-  typeof request !== "undefined" &&
-  request &&
-  request.message &&
-  request.message.message_id
-) {
-  messageId = request.message.message_id
-}
-
-// ==========================================
-// ✏️ SAME MESSAGE EDIT SYSTEM
-// ==========================================
+// =====================================================
+// 🔄 SAME MESSAGE EDIT SYSTEM
+// =====================================================
 
 if (messageId) {
+
   try {
+
     Api.editMessageText({
-      chat_id: userId,
+      chat_id: chatId,
       message_id: messageId,
       text: text,
       parse_mode: "HTML",
@@ -248,43 +319,47 @@ if (messageId) {
         inline_keyboard: buttons
       }
     })
+
   } catch (error) {
 
-    // ======================================
-    // 🧹 DELETE OLD MESSAGE
-    // ======================================
-
     try {
+
       Api.deleteMessage({
-        chat_id: userId,
+        chat_id: chatId,
         message_id: messageId
       })
-    } catch (deleteError) {}
 
-    // ======================================
-    // 📩 SEND NEW MESSAGE
-    // ======================================
+    } catch (deleteError) {
+      // Ignore delete errors
+    }
 
     Api.sendMessage({
+      chat_id: chatId,
       text: text,
       parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: buttons
       }
     })
+
   }
+
 }
 
-// ==========================================
+
+// =====================================================
 // 📩 DIRECT COMMAND MESSAGE
-// ==========================================
+// =====================================================
 
 else {
+
   Api.sendMessage({
+    chat_id: chatId,
     text: text,
     parse_mode: "HTML",
     reply_markup: {
       inline_keyboard: buttons
     }
   })
+
 }

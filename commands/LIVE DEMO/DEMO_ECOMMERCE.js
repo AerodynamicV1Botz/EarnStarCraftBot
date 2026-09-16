@@ -16,23 +16,25 @@
   group: 
 CMD*/
 
+/*CMD
+  command: DEMO_ECOMMERCE
+  need_reply: false
+  folder: MAIN_MENU
+*/
+
 // ==========================================
 // 🤖 EARNSTAR BOTCRAFT
-// SCRIPT 59 — UPDATED VERSION
-// COMMAND NAME: DEMO_ECOMMERCE
-// STEP 5.1 — E-COMMERCE BOT DEMO
-// 📁 MAIN MENU → 📁 LIVE DEMOS → 📁 E-COMMERCE
-// 🇮🇳 Hinglish | 🇬🇧 English | 🇬🇺 Gujarati
-// ✅ Same Message Edit + Delete Fallback
+// SCRIPT 59 — DEMO E-COMMERCE
+// STEP 5.1
 // ==========================================
 
-var uid = user.telegramid
+var uid = String(user.telegramid)
 
 var userData = Bot.getProperty("USER_" + uid) || {}
 var lang = userData.language || "hinglish"
 
 // ==========================================
-// ⚡ INSTANT CALLBACK RESPONSE
+// ⚡ CALLBACK RESPONSE
 // ==========================================
 
 if (
@@ -40,28 +42,40 @@ if (
   request &&
   request.id
 ) {
-  Api.answerCallbackQuery({
-    callback_query_id: request.id
-  })
+  try {
+    Api.answerCallbackQuery({
+      callback_query_id: request.id
+    })
+  } catch (error) {}
 }
 
 // ==========================================
-// 🔧 EDIT CURRENT MENU MESSAGE
+// 🔧 SHOW MENU
 // ==========================================
 
 function showEcommerceMenu(text, buttons) {
 
+  var messageId = ""
+
   if (
     typeof request !== "undefined" &&
-    request.message &&
-    request.message.message_id
+    request &&
+    request.message
   ) {
+    if (request.message.message_id) {
+      messageId = String(request.message.message_id)
+    } else if (request.message.messageId) {
+      messageId = String(request.message.messageId)
+    }
+  }
+
+  if (messageId) {
 
     try {
 
       Api.editMessageText({
         chat_id: uid,
-        message_id: request.message.message_id,
+        message_id: messageId,
         text: text,
         parse_mode: "HTML",
         reply_markup: {
@@ -76,7 +90,7 @@ function showEcommerceMenu(text, buttons) {
       try {
         Api.deleteMessage({
           chat_id: uid,
-          message_id: request.message.message_id
+          message_id: messageId
         })
       } catch (deleteError) {}
 
@@ -94,48 +108,10 @@ function showEcommerceMenu(text, buttons) {
 }
 
 // ==========================================
-// 🎛️ COMMON BUTTONS
+// 🎛️ ONLY NAVIGATION BUTTONS
 // ==========================================
 
 var demoButtons = [
-  [
-    {
-      text: "🛍️ Browse Products",
-      callback_data: "ECOM_PRODUCTS"
-    }
-  ],
-  [
-    {
-      text: "📦 Order Flow",
-      callback_data: "ECOM_ORDER_FLOW"
-    },
-    {
-      text: "👤 Customer Flow",
-      callback_data: "ECOM_CUSTOMER"
-    }
-  ],
-  [
-    {
-      text: "🔔 Notifications",
-      callback_data: "ECOM_NOTIFICATIONS"
-    },
-    {
-      text: "👑 Admin Features",
-      callback_data: "ECOM_ADMIN"
-    }
-  ],
-  [
-    {
-      text: "🚀 Build Similar Bot",
-      callback_data: "BUILD_CUSTOM"
-    }
-  ],
-  [
-    {
-      text: "💰 View Pricing",
-      callback_data: "MENU_PRICING"
-    }
-  ],
   [
     {
       text: "🎬 All Demos",
@@ -158,142 +134,100 @@ if (lang === "hinglish") {
     "🛒 <b>E-COMMERCE BOT DEMO</b>\n\n" +
     "━━━━━━━━━━━━━━━━━━\n\n" +
 
-    "✨ Ye demo dikhata hai ki aapka Telegram store bot kaise work kar sakta hai.\n\n" +
+    "✨ Telegram par ek complete online store bot aise work kar sakta hai.\n\n" +
 
     "📦 <b>Products</b>\n" +
-    "Customers products browse kar sakte hain.\n\n" +
+    "Customers products browse kar sakte hain aur product details dekh sakte hain.\n\n" +
 
     "🛍️ <b>Orders</b>\n" +
-    "Product selection aur order flow manage kiya ja sakta hai.\n\n" +
+    "Customer product select karke order request submit kar sakta hai.\n\n" +
 
     "👤 <b>Customer System</b>\n" +
-    "Customer information aur enquiries collect ki ja sakti hain.\n\n" +
+    "Customer name, contact details aur order information collect ki ja sakti hai.\n\n" +
 
     "🔔 <b>Notifications</b>\n" +
-    "Order aur important updates automatically send kiye ja sakte hain.\n\n" +
+    "Order confirmation aur important updates automatically send kiye ja sakte hain.\n\n" +
 
     "👑 <b>Admin Control</b>\n" +
-    "Admin products, orders aur customers manage kar sakta hai.\n\n" +
+    "Admin products, orders, customers aur order status manage kar sakta hai.\n\n" +
 
-    "👇 <b>Demo feature select karein:</b>"
+    "💡 <b>Use Case</b>\n" +
+    "Clothing store, digital products, local business, services aur community-based selling ke liye useful.\n\n" +
 
-  showEcommerceMenu(text, demoButtons)
-  return
+    "🚀 <b>Custom Version</b>\n" +
+    "Aapke business ke according complete custom E-Commerce Bot banaya ja sakta hai."
 }
 
 // ==========================================
 // 🇬🇧 ENGLISH
 // ==========================================
 
-if (lang === "english") {
+else if (lang === "english") {
 
   var text =
     "🛒 <b>E-COMMERCE BOT DEMO</b>\n\n" +
     "━━━━━━━━━━━━━━━━━━\n\n" +
 
-    "✨ Explore how a Telegram store bot can work.\n\n" +
+    "✨ Explore how a complete online store bot can work inside Telegram.\n\n" +
 
     "📦 <b>Products</b>\n" +
-    "Customers can browse products directly inside Telegram.\n\n" +
+    "Customers can browse products and view product details.\n\n" +
 
     "🛍️ <b>Orders</b>\n" +
-    "Product selection and order workflows can be managed.\n\n" +
+    "Customers can select products and submit order requests.\n\n" +
 
     "👤 <b>Customer System</b>\n" +
-    "Customer information and enquiries can be collected.\n\n" +
+    "Customer names, contact details and order information can be collected.\n\n" +
 
     "🔔 <b>Notifications</b>\n" +
-    "Order and important updates can be sent automatically.\n\n" +
+    "Order confirmations and important updates can be sent automatically.\n\n" +
 
     "👑 <b>Admin Control</b>\n" +
-    "Admins can manage products, orders and customers.\n\n" +
+    "Admins can manage products, orders, customers and order status.\n\n" +
 
-    "👇 <b>Select a demo feature:</b>"
+    "💡 <b>Use Case</b>\n" +
+    "Useful for clothing stores, digital products, local businesses, services and community-based selling.\n\n" +
 
-  showEcommerceMenu(text, demoButtons)
-  return
+    "🚀 <b>Custom Version</b>\n" +
+    "A complete custom E-Commerce Bot can be built according to your business."
 }
 
 // ==========================================
 // 🇬🇺 GUJARATI
 // ==========================================
 
-if (lang === "gujarati") {
-
-  var gujaratiButtons = [
-    [
-      {
-        text: "🛍️ Products જુઓ",
-        callback_data: "ECOM_PRODUCTS"
-      }
-    ],
-    [
-      {
-        text: "📦 Order Flow",
-        callback_data: "ECOM_ORDER_FLOW"
-      },
-      {
-        text: "👤 Customer Flow",
-        callback_data: "ECOM_CUSTOMER"
-      }
-    ],
-    [
-      {
-        text: "🔔 Notifications",
-        callback_data: "ECOM_NOTIFICATIONS"
-      },
-      {
-        text: "👑 Admin Features",
-        callback_data: "ECOM_ADMIN"
-      }
-    ],
-    [
-      {
-        text: "🚀 આવું Bot બનાવો",
-        callback_data: "BUILD_CUSTOM"
-      }
-    ],
-    [
-      {
-        text: "💰 Pricing",
-        callback_data: "MENU_PRICING"
-      }
-    ],
-    [
-      {
-        text: "🎬 બધા Demos",
-        callback_data: "MENU_DEMO"
-      },
-      {
-        text: "🏠 Main Menu",
-        callback_data: "BACK_MAIN_MENU"
-      }
-    ]
-  ]
+else {
 
   var text =
     "🛒 <b>E-COMMERCE BOT DEMO</b>\n\n" +
     "━━━━━━━━━━━━━━━━━━\n\n" +
 
-    "✨ Telegram store bot કેવી રીતે કામ કરી શકે તેનું demo જુઓ.\n\n" +
+    "✨ Telegram માં complete online store bot કેવી રીતે કામ કરી શકે તેનું demo.\n\n" +
 
     "📦 <b>Products</b>\n" +
-    "Customers Telegram માં products browse કરી શકે છે.\n\n" +
+    "Customers products browse કરી શકે છે અને details જોઈ શકે છે.\n\n" +
 
     "🛍️ <b>Orders</b>\n" +
-    "Product selection અને order workflow manage કરી શકાય છે.\n\n" +
+    "Customer product select કરીને order request submit કરી શકે છે.\n\n" +
 
     "👤 <b>Customer System</b>\n" +
-    "Customer information અને enquiries collect કરી શકાય છે.\n\n" +
+    "Customer name, contact details અને order information collect કરી શકાય છે.\n\n" +
 
     "🔔 <b>Notifications</b>\n" +
-    "Order અને important updates automatically મોકલી શકાય છે.\n\n" +
+    "Order confirmation અને important updates automatically મોકલી શકાય છે.\n\n" +
 
     "👑 <b>Admin Control</b>\n" +
-    "Admin products, orders અને customers manage કરી શકે છે.\n\n" +
+    "Admin products, orders, customers અને order status manage કરી શકે છે.\n\n" +
 
-    "👇 <b>Demo feature પસંદ કરો:</b>"
+    "💡 <b>Use Case</b>\n" +
+    "Clothing store, digital products, local business, services અને community selling માટે ઉપયોગી.\n\n" +
 
-  showEcommerceMenu(text, gujaratiButtons)
-  return
-}
+    "🚀 <b>Custom Version</b>\n" +
+    "તમારા business પ્રમાણે complete custom E-Commerce Bot બનાવી શકાય છે."
+  }
+
+// ==========================================
+// 📤 SHOW FINAL DEMO
+// ==========================================
+
+showEcommerceMenu(text, demoButtons)
